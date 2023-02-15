@@ -20,6 +20,7 @@ Parameter   p_delay;
 
 
 // TODO
+// Add white noise VCO
 // Add pitch offset for VCOs -- for detune -- Default patch is vcos[1].baseFreq = vcos[0].baseFreq * 0.993f
 // Add trigger changes for voice and KSynth levels
 // Add voice stealing -- replace oldest note, never replace bottom note.
@@ -61,9 +62,6 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
     float cutoff[1] = { p_freq.Process() };
     synth.Trigger(ParamChange, cutoffParam, cutoff);
 
-//    int resonanceParam[1] = { (int) SynthParam::VcfResonance };
-//    float resonance[1] = { p_res.Process() };
-//    synth.Trigger(ParamChange, resonanceParam, resonance);
     int delayParam[1] = { (int) SynthParam::DelayTime };
     float delayTime[1] = { p_delay.Process() };
     synth.Trigger(ParamChange, delayParam, delayTime);
@@ -155,8 +153,7 @@ void InitTestPatch()
     // VCO 2
     param[0] = (int) SynthParam::VcoWaveform;
     param[1] = 1;
-//    param[2] = (int) Oscillator::WAVE_POLYBLEP_SAW;
-    param[2] = (int) Oscillator::WAVE_SAW;
+    param[2] = (int) Oscillator::WAVE_POLYBLEP_SAW;
     synth.Trigger(ParamChange, param, value);
 
     param[0] = (int) SynthParam::VcoLevel;
