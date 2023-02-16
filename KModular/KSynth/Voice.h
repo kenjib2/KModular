@@ -8,6 +8,7 @@
 #include "daisysp.h"
 #include "../AudioModule.h"
 #include "VCO.h"
+#include "WhiteNoiseOsc.h"
 #include "VCF.h"
 #include "VCA.h"
 
@@ -25,8 +26,10 @@ namespace kmodular
     {
         private:
             std::vector<VCO> vcos;
+            WhiteNoiseOsc    whiteNoise;
             VCF              vcf;
             VCA              vca;
+            float            level;
 
         public:
             bool             noteTriggered;

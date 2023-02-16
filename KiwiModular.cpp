@@ -20,9 +20,7 @@ Parameter   p_delay;
 
 
 // TODO
-// Add white noise VCO
-// Add pitch offset for VCOs -- for detune -- Default patch is vcos[1].baseFreq = vcos[0].baseFreq * 0.993f
-// Add trigger changes for voice and KSynth levels
+// Add trigger changes for KSynth pitch offset
 // Add voice stealing -- replace oldest note, never replace bottom note.
 // envelope depth for VCO/VCF/VCA
 // figure out if envelopes and LFOs should add, subtract, or modulate from center
@@ -99,7 +97,18 @@ void InitTestPatch()
     int param[3] = { 0, 0, 0 };
     float value[1] = { 0.0f };
 
-    // VCO 1
+    // Synth
+    param[0] = (int) SynthParam::Level;
+    value[0] = 1.0f;
+    synth.Trigger(ParamChange, param, value);
+
+    // Voice
+    param[0] = (int) SynthParam::VoiceLevel;
+    param[1] = 1;
+    value[0] = 1.0f;
+    synth.Trigger(ParamChange, param, value);
+
+    // VCOs
     param[0] = (int) SynthParam::VcoWaveform;
     param[1] = 0;
     param[2] = (int) Oscillator::WAVE_POLYBLEP_SAW;
@@ -110,9 +119,20 @@ void InitTestPatch()
     value[0] = 0.7f;
     synth.Trigger(ParamChange, param, value);
 
+    param[0] = (int) SynthParam::VcoPitchOffset;
+    param[1] = 0;
+    value[0] = 0.0f;
+    synth.Trigger(ParamChange, param, value);
+
+    param[0] = (int) SynthParam::VcoPitchOffset;
+    param[1] = 2;
+    value[0] = 0.03f;
+    synth.Trigger(ParamChange, param, value);
+
+    // Detuning the second voice
     param[0] = (int) SynthParam::VcoEnvAttack;
     param[1] = 0;
-    value[0] = 0.002f;
+    value[0] = -0.007f;
     synth.Trigger(ParamChange, param, value);
 
     param[0] = (int) SynthParam::VcoEnvDecay;
@@ -151,7 +171,7 @@ void InitTestPatch()
     synth.Trigger(ParamChange, param, value);
 
     // VCO 2
-    param[0] = (int) SynthParam::VcoWaveform;
+/*    param[0] = (int) SynthParam::VcoWaveform;
     param[1] = 1;
     param[2] = (int) Oscillator::WAVE_POLYBLEP_SAW;
     synth.Trigger(ParamChange, param, value);
@@ -199,6 +219,12 @@ void InitTestPatch()
     param[0] = (int) SynthParam::VcoLfoDepth;
     param[1] = 1;
     value[0] = 0.03f;
+    synth.Trigger(ParamChange, param, value);
+*/
+    // White Noise
+    param[0] = (int) SynthParam::WhiteNoiseOscLevel;
+    param[1] = 1;
+    value[0] = 0.0f;
     synth.Trigger(ParamChange, param, value);
 
     // VCF

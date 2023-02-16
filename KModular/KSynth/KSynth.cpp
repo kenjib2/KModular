@@ -24,6 +24,17 @@ namespace kmodular
     }
 
 
+    void KSynth::Reset()
+    {
+        level = 1.0f;
+        for (size_t i = 0; i < voices.size(); i++) {
+            voices[i].Reset();
+        }
+        reverb.Reset();
+        delay.Reset();
+    }
+
+
     void KSynth::Process(const float* in, float* out, size_t sizeIn, size_t sizeOut)
     {
         if (sizeOut < 2) {
@@ -45,18 +56,8 @@ namespace kmodular
         float reverbOut[2];
         reverb.Process(delayOut, reverbOut, 2, 2);
 
-        out[0] = reverbOut[0];
-        out[1] = reverbOut[1];
-    }
-
-
-    void KSynth::Reset()
-    {
-        for (size_t i = 0; i < voices.size(); i++) {
-            voices[i].Reset();
-        }
-        reverb.Reset();
-        delay.Reset();
+        out[0] = reverbOut[0] * level;
+        out[1] = reverbOut[1] * level;
     }
 
 
@@ -85,7 +86,7 @@ namespace kmodular
                 SynthParam synthParam = (SynthParam)intVals[0];
 
                 // Handle voice level params
-                if (synthParam >= VcoWaveform && synthParam <= VcaLfoDepth) {
+                if (synthParam >= VoiceLevel && synthParam <= VcaLfoDepth) {
                     for (size_t i = 0; i < voices.size(); i++) {
                         voices[i].Trigger(command, intVals, floatVals);
                     }
@@ -100,8 +101,16 @@ namespace kmodular
 
                 // Handle patch level params
                 } else {
-                }
+                    switch (synthParam)
+                    {
+                        case Level:
+                            level = floatVals[0];
+                            break;
 
+                        default:
+                            break;
+                    }
+                }
                 break;
         }
     }

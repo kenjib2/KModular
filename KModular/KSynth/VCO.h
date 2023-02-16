@@ -19,12 +19,16 @@ namespace kmodular
         private:
             bool            noteTriggered;
 
+            void CalculateBaseFreq();
+
         public:
             Oscillator osc;
             Adsr       env;
             Oscillator lfo;
+            int        midiNote;
             float      baseFreq;
             float      envDepth;
+            float      pitchOffset;
 
             VCO() {}
             ~VCO() {}

@@ -27,6 +27,8 @@ namespace kmodular
         ReverbFeedback,
         ReverbLpFreq,
 
+        VoiceLevel,
+
         VcoWaveform,
         VcoLevel,
         VcoPitchOffset,
@@ -38,6 +40,8 @@ namespace kmodular
         VcoLfoWaveform,
         VcoLfoRate,
         VcoLfoDepth,
+
+        WhiteNoiseOscLevel,
 
         VcfFrequency,
         VcfResonance,

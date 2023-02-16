@@ -19,6 +19,7 @@ namespace kmodular
     void VCO::Reset()
     {
         noteTriggered = false;
+        pitchOffset = 0.0f;
 
         osc.SetWaveform(Oscillator::WAVE_POLYBLEP_SAW);
         osc.SetFreq(baseFreq);
@@ -60,7 +61,9 @@ namespace kmodular
         {
             case NoteOn:
                 noteTriggered = true;
-                baseFreq = mtof(intVals[0]);
+                midiNote = intVals[0];
+                CalculateBaseFreq();
+                
                 if (env.IsRunning()) {
                     env.Retrigger(false);
                 } else {
@@ -75,6 +78,7 @@ namespace kmodular
             case ParamChange:
                 SynthParam synthParam = (SynthParam)intVals[0];
                 uint8_t waveform = Oscillator::WAVE_TRI;
+
                 switch (synthParam)
                 {
                     case VcoWaveform:
@@ -83,6 +87,9 @@ namespace kmodular
                         break;
                     case VcoLevel:
                         osc.SetAmp(floatVals[0]);
+                        break;
+                    case VcoPitchOffset:
+                        pitchOffset = floatVals[0];
                         break;
 
                     case VcoEnvAttack:
@@ -117,6 +124,12 @@ namespace kmodular
                 }
                 break;
         }
+    }
+
+
+    void VCO::CalculateBaseFreq()
+    {
+        baseFreq = mtof(midiNote + pitchOffset);
     }
 
 }
