@@ -22,8 +22,7 @@ Parameter   p_delay;
 // TODO
 // Add trigger changes for KSynth pitch offset
 // Add voice stealing -- replace oldest note, never replace bottom note.
-// envelope depth for VCO/VCF/VCA
-// figure out if envelopes and LFOs should add, subtract, or modulate from center
+// figure out if envelopes and LFOs should add, subtract, or modulate from center -- I think all is correct make sure VCO adds to pitch
 // make VCO/VCA/VCF mods logorithmic?
 
 
@@ -170,57 +169,6 @@ void InitTestPatch()
     value[0] = 0.03f;
     synth.Trigger(ParamChange, param, value);
 
-    // VCO 2
-/*    param[0] = (int) SynthParam::VcoWaveform;
-    param[1] = 1;
-    param[2] = (int) Oscillator::WAVE_POLYBLEP_SAW;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoLevel;
-    param[1] = 1;
-    value[0] = 0.7f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoEnvAttack;
-    param[1] = 1;
-    value[0] = 0.002f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoEnvDecay;
-    param[1] = 1;
-    value[0] = 0.0f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoEnvSustain;
-    param[1] = 1;
-    value[0] = 1.0f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoEnvRelease;
-    param[1] = 1;
-    value[0] = 0.002f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoEnvDepth;
-    param[1] = 1;
-    value[0] = 0.0f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoLfoWaveform;
-    param[1] = 1;
-    param[2] = (int) Oscillator::WAVE_TRI;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoLfoRate;
-    param[1] = 1;
-    value[0] = 3.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcoLfoDepth;
-    param[1] = 1;
-    value[0] = 0.03f;
-    synth.Trigger(ParamChange, param, value);
-*/
     // White Noise
     param[0] = (int) SynthParam::WhiteNoiseOscLevel;
     param[1] = 1;
