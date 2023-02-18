@@ -27,6 +27,8 @@ namespace kmodular
     void KSynth::Reset()
     {
         level = 1.0f;
+        pitchOffset = 0.0f;
+
         for (size_t i = 0; i < voices.size(); i++) {
             voices[i].Reset();
         }
@@ -105,6 +107,13 @@ namespace kmodular
                     {
                         case Level:
                             level = floatVals[0];
+                            break;
+
+                        case PitchOffset:
+                            pitchOffset = floatVals[0];
+                            for (size_t i = 0; i < voices.size(); i++) {
+                                voices[i].Trigger(command, intVals, floatVals);
+                            }
                             break;
 
                         default:

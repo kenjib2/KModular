@@ -111,6 +111,12 @@ namespace kmodular
                         vcos[vcoNumber - 1].Trigger(command, intVals, floatVals);
                     }
 
+                // Global pitch offset
+                } else if (synthParam == PitchOffset) {
+                    for (size_t i = 0; i < vcos.size(); i++) {
+                        vcos[i].Trigger(command, intVals, floatVals);
+                    }
+
                 // Noise Params
                 } else if (synthParam >= WhiteNoiseOscLevel && synthParam <= WhiteNoiseOscLevel) {
                     whiteNoise.Trigger(command, intVals, floatVals);

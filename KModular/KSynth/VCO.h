@@ -29,6 +29,7 @@ namespace kmodular
             float      baseFreq;
             float      envDepth;
             float      pitchOffset;
+            float      globalPitchOffset;
 
             VCO() {}
             ~VCO() {}

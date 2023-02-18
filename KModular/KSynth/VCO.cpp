@@ -20,6 +20,7 @@ namespace kmodular
     {
         noteTriggered = false;
         pitchOffset = 0.0f;
+        globalPitchOffset = 0.0f;
 
         osc.SetWaveform(Oscillator::WAVE_POLYBLEP_SAW);
         osc.SetFreq(baseFreq);
@@ -91,6 +92,9 @@ namespace kmodular
                     case VcoPitchOffset:
                         pitchOffset = floatVals[0];
                         break;
+                    case PitchOffset:
+                        globalPitchOffset = floatVals[0];
+                        break;
 
                     case VcoEnvAttack:
                         env.SetAttackTime(floatVals[0]);
@@ -129,7 +133,7 @@ namespace kmodular
 
     void VCO::CalculateBaseFreq()
     {
-        baseFreq = mtof(midiNote + pitchOffset);
+        baseFreq = mtof(midiNote + pitchOffset + globalPitchOffset);
     }
 
 }

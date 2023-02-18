@@ -31,6 +31,7 @@ namespace kmodular
             ReverbModule    reverb;
             DelayModule     delay;
             float           level;
+            float           pitchOffset;
 
             Voice* RequestVoice(int midiNote);
 

@@ -20,7 +20,6 @@ Parameter   p_delay;
 
 
 // TODO
-// Add trigger changes for KSynth pitch offset
 // Add voice stealing -- replace oldest note, never replace bottom note.
 // make VCO/VCA/VCF mods logorithmic?
 
@@ -98,6 +97,10 @@ void InitTestPatch()
     // Synth
     param[0] = (int) SynthParam::Level;
     value[0] = 1.0f;
+    synth.Trigger(ParamChange, param, value);
+
+    param[0] = (int) SynthParam::PitchOffset;
+    value[0] = 0.0f;
     synth.Trigger(ParamChange, param, value);
 
     // Voice
