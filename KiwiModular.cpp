@@ -22,7 +22,6 @@ Parameter   p_delay;
 // TODO
 // Add trigger changes for KSynth pitch offset
 // Add voice stealing -- replace oldest note, never replace bottom note.
-// figure out if envelopes and LFOs should add, subtract, or modulate from center -- I think all is correct make sure VCO adds to pitch
 // make VCO/VCA/VCF mods logorithmic?
 
 
@@ -55,9 +54,9 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
         synth.Trigger(TriggerCommand::NoteOff, intVals, NULL);
     }
 
-    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
-    float cutoff[1] = { p_freq.Process() };
-    synth.Trigger(ParamChange, cutoffParam, cutoff);
+//    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
+//    float cutoff[1] = { p_freq.Process() };
+//    synth.Trigger(ParamChange, cutoffParam, cutoff);
 
     int delayParam[1] = { (int) SynthParam::DelayTime };
     float delayTime[1] = { p_delay.Process() };
@@ -123,15 +122,15 @@ void InitTestPatch()
     value[0] = 0.0f;
     synth.Trigger(ParamChange, param, value);
 
+    // Detuning the second voice
     param[0] = (int) SynthParam::VcoPitchOffset;
     param[1] = 2;
-    value[0] = 0.03f;
+    value[0] = -0.007f;
     synth.Trigger(ParamChange, param, value);
 
-    // Detuning the second voice
     param[0] = (int) SynthParam::VcoEnvAttack;
     param[1] = 0;
-    value[0] = -0.007f;
+    value[0] = 0.002f;
     synth.Trigger(ParamChange, param, value);
 
     param[0] = (int) SynthParam::VcoEnvDecay;
@@ -177,7 +176,7 @@ void InitTestPatch()
 
     // VCF
     param[0] = (int) SynthParam::VcfFrequency;
-    value[0] = 800.0f;
+    value[0] = 100.0f;
     synth.Trigger(ParamChange, param, value);
 
     param[0] = (int) SynthParam::VcfResonance;
@@ -201,7 +200,7 @@ void InitTestPatch()
     synth.Trigger(ParamChange, param, value);
 
     param[0] = (int) SynthParam::VcfEnvDepth;
-    value[0] = 1.0f;
+    value[0] = 0.06f;
     synth.Trigger(ParamChange, param, value);
 
     param[0] = (int) SynthParam::VcfLfoWaveform;

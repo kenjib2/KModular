@@ -43,9 +43,9 @@ namespace kmodular
             return;
         }
 
-        float envAmount = env.Process(noteTriggered) * envDepth + 1.0f - envDepth;
+        float envAmount = env.Process(noteTriggered) * envDepth;
         float lfoAmount = 1.0f - lfo.Process();
-        float computedFrequency = frequency * envAmount * lfoAmount;
+        float computedFrequency = frequency * lfoAmount + (18000 - frequency) * envAmount ;
         filtL.SetFreq(computedFrequency);
         filtR.SetFreq(computedFrequency);
 
