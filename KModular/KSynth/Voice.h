@@ -22,7 +22,7 @@ namespace kmodular
     const int DEFAULT_NUM_VCOS = 2;
 
 
-    class Voice: AudioModule
+    class Voice: public AudioModule
     {
         private:
             std::vector<VCO> vcos;

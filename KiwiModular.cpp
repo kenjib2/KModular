@@ -3,6 +3,7 @@
 #include "KModular/KSynth/KSynth.h"
 #include "KModular/AudioModule.h"
 #include "KModular/KEffect/DelayModule.h"
+#include "KModular/MidiTrigger.h"
 
 
 using namespace daisy;
@@ -17,6 +18,7 @@ DaisyPod    hw;
 KSynth      synth;
 Parameter   p_freq;
 Parameter   p_delay;
+MidiTrigger midiTrigger;
 
 
 // TODO
@@ -53,9 +55,9 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
         synth.Trigger(TriggerCommand::NoteOff, intVals, NULL);
     }
 
-//    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
-//    float cutoff[1] = { p_freq.Process() };
-//    synth.Trigger(ParamChange, cutoffParam, cutoff);
+    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
+    float cutoff[1] = { p_freq.Process() };
+    synth.Trigger(ParamChange, cutoffParam, cutoff);
 
     int delayParam[1] = { (int) SynthParam::DelayTime };
     float delayTime[1] = { p_delay.Process() };
@@ -82,10 +84,16 @@ int main(void)
     p_freq.Init(hw.knob1, 10.0f, 12000.0f, Parameter::LOGARITHMIC);
     p_delay.Init(hw.knob2, hw.AudioSampleRate() * .05, MAX_DELAY, Parameter::LOGARITHMIC);
 
+    midiTrigger.Init(&hw);
+    midiTrigger.AddMidiListener(&synth);
+
     hw.StartAdc();
 	hw.StartAudio(AudioCallback);
 
-	while(1) {}
+	while(1)
+    {
+        midiTrigger.Process();
+    }
 }
 
 

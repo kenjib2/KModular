@@ -24,7 +24,7 @@ namespace kmodular
     const int DEFAULT_NUM_VOICES = 8;
 
 
-    class KSynth: AudioModule
+    class KSynth: public AudioModule
     {
         private:
             vector<Voice>   voices;
