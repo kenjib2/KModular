@@ -66,6 +66,7 @@ namespace kmodular
 
     class AudioModule {
         public:
+            int midiChannel;
             virtual void Init(float sampleRate) = 0; // Runs only once when first starting up.
             virtual void Reset() = 0; // Sets it back to default values.
             virtual void Process(const float* in, float* out, size_t sizeIn = 2, size_t sizeOut = 2) = 0; // Process one sample.

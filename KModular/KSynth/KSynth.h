@@ -11,6 +11,7 @@
 #include "Voice.h"
 #include "../KEffect/ReverbModule.h"
 #include "../KEffect/DelayModule.h"
+#include "KSynthPatch.h"
 
 
 using namespace daisy;
@@ -27,6 +28,7 @@ namespace kmodular
     class KSynth: public AudioModule
     {
         private:
+            float           sampleRate;
             vector<Voice>   voices;
             ReverbModule    reverb;
             DelayModule     delay;
@@ -44,6 +46,7 @@ namespace kmodular
             void Reset();
             void Process(const float* in, float* out, size_t sizeIn = 2, size_t sizeOut = 2);
             void Trigger(TriggerCommand command, int* intVals, float* floatVals);
+            void LoadPatch(KSynthPatch* patch);
     };
 
 }

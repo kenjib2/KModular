@@ -19,6 +19,7 @@ namespace kmodular
         private:
             DaisyPod*                   hw;
             std::vector<AudioModule*>    midiListeners;
+            void HandleMidiMessage(MidiEvent* m);
 
         public:
             MidiTrigger() {}
@@ -26,7 +27,6 @@ namespace kmodular
             void Init(DaisyPod* hw);
             void AddMidiListener(AudioModule* midiListener);
             void Process();
-            void HandleMidiMessage(MidiEvent* m);
     };
 
 }

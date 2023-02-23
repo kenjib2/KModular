@@ -1,6 +1,7 @@
 #include "daisy_pod.h"
 #include "daisysp.h"
 #include "KModular/KSynth/KSynth.h"
+#include "KModular/KSynth/KSynthPatch.h"
 #include "KModular/AudioModule.h"
 #include "KModular/KEffect/DelayModule.h"
 #include "KModular/MidiTrigger.h"
@@ -24,9 +25,13 @@ MidiTrigger midiTrigger;
 // TODO
 // Add voice stealing -- replace oldest note, never replace bottom note.
 // make VCO/VCA/VCF mods logorithmic?
+// Only listen to set midi channel
+// Add velocity to NoteOn
+// Look into clipping issues
 
 
 void InitTestPatch();
+void InitTestPatch2();
 
 
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
@@ -55,14 +60,14 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
         synth.Trigger(TriggerCommand::NoteOff, intVals, NULL);
     }
 
-    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
+/*    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
     float cutoff[1] = { p_freq.Process() };
     synth.Trigger(ParamChange, cutoffParam, cutoff);
 
     int delayParam[1] = { (int) SynthParam::DelayTime };
     float delayTime[1] = { p_delay.Process() };
     synth.Trigger(ParamChange, delayParam, delayTime);
-
+*/
 	for (size_t i = 0; i < size; i++)
 	{
 		float outSamples[2];
@@ -80,7 +85,7 @@ int main(void)
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 
 	synth.Init(hw.AudioSampleRate(), NUM_VOICES);
-    InitTestPatch();
+    InitTestPatch2();
     p_freq.Init(hw.knob1, 10.0f, 12000.0f, Parameter::LOGARITHMIC);
     p_delay.Init(hw.knob2, hw.AudioSampleRate() * .05, MAX_DELAY, Parameter::LOGARITHMIC);
 
@@ -99,186 +104,135 @@ int main(void)
 
 void InitTestPatch()
 {
-    int param[3] = { 0, 0, 0 };
-    float value[1] = { 0.0f };
+    KSynthPatch patch;
+    patch.patchName = "TestPatch";
+    patch.pitchOffset = 0.0f;
+    patch.level = 1.0f;
 
-    // Synth
-    param[0] = (int) SynthParam::Level;
-    value[0] = 1.0f;
-    synth.Trigger(ParamChange, param, value);
+    patch.delayTime = 0.5f;
+    patch.delayLevel = 0.5f;
+    patch.delayFeedback = 0.3f;
 
-    param[0] = (int) SynthParam::PitchOffset;
-    value[0] = 0.0f;
-    synth.Trigger(ParamChange, param, value);
+    patch.reverbLevel = 0.35f;
+    patch.reverbFeedback = 0.82f;
+    patch.reverbLpFreq = 12000.0f;
 
-    // Voice
-    param[0] = (int) SynthParam::VoiceLevel;
-    param[1] = 1;
-    value[0] = 1.0f;
-    synth.Trigger(ParamChange, param, value);
+    //patch.voiceLevel = 1.0f;
 
-    // VCOs
-    param[0] = (int) SynthParam::VcoWaveform;
-    param[1] = 0;
-    param[2] = (int) Oscillator::WAVE_POLYBLEP_SAW;
-    synth.Trigger(ParamChange, param, value);
+    patch.numVcos = 2;
 
-    param[0] = (int) SynthParam::VcoLevel;
-    param[1] = 0;
-    value[0] = 0.7f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SAW);
+    patch.vcoLevel.push_back(0.7f);
+    patch.vcoPitchOffset.push_back(0.0f);
+    patch.vcoEnvAttack.push_back(0.002f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(0.002f);
+    patch.vcoEnvDepth.push_back(0.0f);
+    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(3.3f);
+    patch.vcoLfoDepth.push_back(0.03f);
 
-    param[0] = (int) SynthParam::VcoPitchOffset;
-    param[1] = 0;
-    value[0] = 0.0f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SAW);
+    patch.vcoLevel.push_back(0.7f);
+    patch.vcoPitchOffset.push_back(-0.007f);
+    patch.vcoEnvAttack.push_back(0.002f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(0.002f);
+    patch.vcoEnvDepth.push_back(0.0f);
+    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(3.3f);
+    patch.vcoLfoDepth.push_back(0.03f);
 
-    // Detuning the second voice
-    param[0] = (int) SynthParam::VcoPitchOffset;
-    param[1] = 2;
-    value[0] = -0.007f;
-    synth.Trigger(ParamChange, param, value);
+    patch.whiteNoiseOscLevel = 0.0f;
 
-    param[0] = (int) SynthParam::VcoEnvAttack;
-    param[1] = 0;
-    value[0] = 0.002f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcfFrequency = 100.0f;
+    patch.vcfResonance = 0.5f;
+    patch.vcfEnvAttack = 0.6f;
+    patch.vcfEnvDecay = 0.2f;
+    patch.vcfEnvSustain = 1.0f;
+    patch.vcfEnvRelease = 0.3f;
+    patch.vcfEnvDepth = 0.06f;
+    patch.vcfLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcfLfoRate = 0.3f;
+    patch.vcfLfoDepth = 0.3f;
 
-    param[0] = (int) SynthParam::VcoEnvDecay;
-    param[1] = 0;
-    value[0] = 0.0f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcaEnvAttack = 0.3f;
+    patch.vcaEnvDecay = 0.2f;
+    patch.vcaEnvSustain = 0.3f;
+    patch.vcaEnvRelease = 0.3f;
+    patch.vcaLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcaLfoRate = 1.5f;
+    patch.vcaLfoDepth = 0.3f;
 
-    param[0] = (int) SynthParam::VcoEnvSustain;
-    param[1] = 0;
-    value[0] = 1.0f;
-    synth.Trigger(ParamChange, param, value);
+    synth.LoadPatch(&patch);
+}
 
-    param[0] = (int) SynthParam::VcoEnvRelease;
-    param[1] = 0;
-    value[0] = 0.002f;
-    synth.Trigger(ParamChange, param, value);
 
-    param[0] = (int) SynthParam::VcoEnvDepth;
-    param[1] = 0;
-    value[0] = 0.0f;
-    synth.Trigger(ParamChange, param, value);
+void InitTestPatch2()
+{
+    KSynthPatch patch;
+    patch.patchName = "TestPatch2";
+    patch.pitchOffset = 0.0f;
+    patch.level = 1.0f;
 
-    param[0] = (int) SynthParam::VcoLfoWaveform;
-    param[1] = 0;
-    param[2] = (int) Oscillator::WAVE_TRI;
-    synth.Trigger(ParamChange, param, value);
+    patch.delayTime = 0.25f;
+    patch.delayLevel = 0.3f;
+    patch.delayFeedback = 0.2f;
 
-    param[0] = (int) SynthParam::VcoLfoRate;
-    param[1] = 0;
-    value[0] = 3.3f;
-    synth.Trigger(ParamChange, param, value);
+    patch.reverbLevel = 0.35f;
+    patch.reverbFeedback = 0.82f;
+    patch.reverbLpFreq = 12000.0f;
 
-    param[0] = (int) SynthParam::VcoLfoDepth;
-    param[1] = 0;
-    value[0] = 0.03f;
-    synth.Trigger(ParamChange, param, value);
+    //patch.voiceLevel = 1.0f;
 
-    // White Noise
-    param[0] = (int) SynthParam::WhiteNoiseOscLevel;
-    param[1] = 1;
-    value[0] = 0.0f;
-    synth.Trigger(ParamChange, param, value);
+    patch.numVcos = 2;
 
-    // VCF
-    param[0] = (int) SynthParam::VcfFrequency;
-    value[0] = 100.0f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SQUARE);
+    patch.vcoLevel.push_back(0.7f);
+    patch.vcoPitchOffset.push_back(0.0f);
+    patch.vcoEnvAttack.push_back(0.002f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(0.002f);
+    patch.vcoEnvDepth.push_back(0.0f);
+    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(3.3f);
+    patch.vcoLfoDepth.push_back(0.0f);
 
-    param[0] = (int) SynthParam::VcfResonance;
-    value[0] = 0.5f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SQUARE);
+    patch.vcoLevel.push_back(0.7f);
+    patch.vcoPitchOffset.push_back(-0.007f);
+    patch.vcoEnvAttack.push_back(0.002f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(0.002f);
+    patch.vcoEnvDepth.push_back(0.0f);
+    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(3.3f);
+    patch.vcoLfoDepth.push_back(0.0f);
 
-    param[0] = (int) SynthParam::VcfEnvAttack;
-    value[0] = 0.6f;
-    synth.Trigger(ParamChange, param, value);
+    patch.whiteNoiseOscLevel = 0.0f;
 
-    param[0] = (int) SynthParam::VcfEnvDecay;
-    value[0] = 0.2f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcfFrequency = 400.0f;
+    patch.vcfResonance = 0.5f;
+    patch.vcfEnvAttack = 0.04f;
+    patch.vcfEnvDecay = 0.0f;
+    patch.vcfEnvSustain = 1.0f;
+    patch.vcfEnvRelease = 0.3f;
+    patch.vcfEnvDepth = 0.06f;
+    patch.vcfLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcfLfoRate = 0.3f;
+    patch.vcfLfoDepth = 0.0f;
 
-    param[0] = (int) SynthParam::VcfEnvSustain;
-    value[0] = 1.0f;
-    synth.Trigger(ParamChange, param, value);
+    patch.vcaEnvAttack = 0.002f;
+    patch.vcaEnvDecay = 0.1f;
+    patch.vcaEnvSustain = 0.0f;
+    patch.vcaEnvRelease = 0.1f;
+    patch.vcaLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcaLfoRate = 1.5f;
+    patch.vcaLfoDepth = 0.0f;
 
-    param[0] = (int) SynthParam::VcfEnvRelease;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcfEnvDepth;
-    value[0] = 0.06f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcfLfoWaveform;
-    param[1] = (int) Oscillator::WAVE_TRI;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcfLfoRate;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcfLfoDepth;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    // VCA
-    param[0] = (int) SynthParam::VcaEnvAttack;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcaEnvDecay;
-    value[0] = 0.2f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcaEnvSustain;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcaEnvRelease;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcaLfoWaveform;
-    param[1] = (int) Oscillator::WAVE_TRI;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcaLfoRate;
-    value[0] = 1.5f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::VcaLfoDepth;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    // Delay
-    param[0] = (int) SynthParam::DelayTime;
-    value[0] = 0.5f * hw.AudioSampleRate();
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::DelayLevel;
-    value[0] = 0.5f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::DelayFeedback;
-    value[0] = 0.3f;
-    synth.Trigger(ParamChange, param, value);
-
-    // Reverb
-    param[0] = (int) SynthParam::ReverbLevel;
-    value[0] = 0.35f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::ReverbFeedback;
-    value[0] = 0.82f;
-    synth.Trigger(ParamChange, param, value);
-
-    param[0] = (int) SynthParam::ReverbLpFreq;
-    value[0] = 12000.0f;
-    synth.Trigger(ParamChange, param, value);
-
+    synth.LoadPatch(&patch);
 }
