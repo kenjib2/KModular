@@ -56,6 +56,9 @@ namespace kmodular
 
     void VCF::Trigger(TriggerCommand command, int* intVals, float* floatVals)
     {
+        SynthParam synthParam;
+        uint8_t waveform;
+
         switch (command)
         {
             case NoteOn:
@@ -72,8 +75,8 @@ namespace kmodular
                 break;
 
             case ParamChange:
-                SynthParam synthParam = (SynthParam)intVals[0];
-                uint8_t waveform = Oscillator::WAVE_TRI;
+                synthParam = (SynthParam)intVals[0];
+                waveform = Oscillator::WAVE_TRI;
                 switch (synthParam)
                 {
                     case VcfFrequency:
@@ -117,6 +120,9 @@ namespace kmodular
                     default:
                         break;
                 }
+                break;
+
+            default:
                 break;
         }
     }

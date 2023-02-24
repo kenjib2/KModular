@@ -68,6 +68,8 @@ namespace kmodular
 
     void Voice::Trigger(TriggerCommand command, int* intVals, float* floatVals)
     {
+        SynthParam synthParam;
+
         switch (command)
         {
             case NoteOn:
@@ -94,7 +96,7 @@ namespace kmodular
                 break;
 
             case ParamChange:
-                SynthParam synthParam = (SynthParam)intVals[0];
+                synthParam = (SynthParam)intVals[0];
                 int vcoNumber;
 
                 // VCO Params
@@ -142,6 +144,9 @@ namespace kmodular
 
                     }
                 }
+                break;
+
+            default:
                 break;
         }
     }

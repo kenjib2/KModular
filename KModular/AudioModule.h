@@ -10,6 +10,7 @@ namespace kmodular
         NoteOn,
         NoteOff,
         ParamChange,
+        MidiControlChange,
     } TriggerCommand;
 
 

@@ -73,7 +73,7 @@ namespace kmodular
                         controlChange = m->AsControlChange();
                         intVals[0] = controlChange.control_number;
                         intVals[1] = controlChange.value;
-                        midiListeners[i]->Trigger(ParamChange, intVals, NULL);
+                        midiListeners[i]->Trigger(MidiControlChange, intVals, NULL);
                         break;
 
                     default:

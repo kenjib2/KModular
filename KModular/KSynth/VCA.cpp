@@ -84,6 +84,9 @@ namespace kmodular
                         break;
                 }
                 break;
+
+            default:
+                break;
         }
     }
 

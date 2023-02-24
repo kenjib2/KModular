@@ -23,6 +23,14 @@ namespace kmodular
 {
     
     const int DEFAULT_NUM_VOICES = 8;
+    const float MAX_ATTACK_TIME = 4.0f;
+    const float MAX_DECAY_TIME = 4.0f;
+    const float MAX_RELEASE_TIME = 4.0f;
+    const float MAX_LFO_RATE = 4.0f;
+    const float MAX_VCO_ENV_DEPTH = 12.0f;
+    const float MAX_VCO_LFO_DEPTH = 12.0f;
+    const float MIN_VCF_FREQUENCY = 10.0f;
+    const float MAX_VCF_FREQUENCY = 18000.0f;
 
 
     class KSynth: public AudioModule
@@ -34,6 +42,7 @@ namespace kmodular
             DelayModule     delay;
             float           level;
             float           pitchOffset;
+            int             ccSelectedVco;
 
             Voice* RequestVoice(int midiNote);
 

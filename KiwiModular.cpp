@@ -28,6 +28,9 @@ MidiTrigger midiTrigger;
 // Only listen to set midi channel
 // Add velocity to NoteOn
 // Look into clipping issues
+// Add pan/balance
+// Implement access to all functions via MIDI
+// Make some MIDI CC translations in KSynth scale logorithmically
 
 
 void InitTestPatch();
