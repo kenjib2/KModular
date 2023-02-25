@@ -2,19 +2,24 @@
 #define KEFFECT_REVERB_H
 
 
+#include "daisy_pod.h"
 #include "daisysp.h"
 #include "../AudioModule.h"
 
 
+using namespace daisy;
 using namespace daisysp;
 
 
 namespace kmodular
 {
 
+    static ReverbSc DSY_SDRAM_BSS reverb;
+
     class ReverbModule: public AudioModule {
+        private:
+
         public:
-            ReverbSc reverb;
             float level;
             float feedback;
             float lpFreq;

@@ -19,8 +19,9 @@ namespace kmodular
             nextVoice.Init(sampleRate);
             voices.push_back(nextVoice);
         }
-        reverb.Init(sampleRate);
+        phaser.Init(sampleRate);
         delay.Init(sampleRate);
+        reverb.Init(sampleRate);
 
         Reset();
     }
@@ -30,12 +31,16 @@ namespace kmodular
     {
         level = 1.0f;
         pitchOffset = 0.0f;
+        phaserEnabled = false;
+        delayEnabled = false;
+        reverbEnabled = false;
 
         for (size_t i = 0; i < voices.size(); i++) {
             voices[i].Reset();
         }
-        reverb.Reset();
+        phaser.Reset();
         delay.Reset();
+        reverb.Reset();
     }
 
 
@@ -54,14 +59,21 @@ namespace kmodular
             result[1] += voiceOut[1];
         }
 
-        float delayOut[2];
-        delay.Process(result, delayOut, sizeIn, 2);
+//        float phaserOut[2];
+//        phaser.Process(result, phaserOut, sizeIn, 2);
 
-        float reverbOut[2];
-        reverb.Process(delayOut, reverbOut, 2, 2);
+        if (delayEnabled) {
+            float delayOut[2];
+            delay.Process(result, delayOut, sizeIn, 2);
+            result[0] = delayOut[0];
+            result[1] = delayOut[1];
+        }
 
-        out[0] = reverbOut[0] * level;
-        out[1] = reverbOut[1] * level;
+//        float reverbOut[2];
+//        reverb.Process(delayOut, reverbOut, 2, 2);
+
+        out[0] = result[0] * level;
+        out[1] = result[1] * level;
     }
 
 

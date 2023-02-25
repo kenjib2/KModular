@@ -26,6 +26,10 @@ namespace kmodular
 
     void DelayModule::Process(const float* in, float* out, size_t sizeIn = 2, size_t sizeOut = 2)
     {
+        if (sizeIn < 2 || sizeOut < 2) {
+            return;
+        }
+
         fonepole(currentDelay, delayTime, .00007f);
         delayL.SetDelay(currentDelay);
         delayR.SetDelay(currentDelay);
@@ -36,7 +40,7 @@ namespace kmodular
         delayL.Write((feedback * outL) + in[0]);
         out[0] = (level * outL) + in[0];
 
-        delayR.Write((feedback * outR) + in[0]);
+        delayR.Write((feedback * outR) + in[1]);
         out[1] = (level * outR) + in[1];
     }
 

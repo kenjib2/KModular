@@ -11,6 +11,7 @@
 #include "Voice.h"
 #include "../KEffect/ReverbModule.h"
 #include "../KEffect/DelayModule.h"
+#include "../KEffect/PhaserModule.h"
 #include "KSynthPatch.h"
 
 
@@ -40,6 +41,7 @@ namespace kmodular
             vector<Voice>   voices;
             ReverbModule    reverb;
             DelayModule     delay;
+            PhaserModule    phaser;
             float           level;
             float           pitchOffset;
             int             ccSelectedVco;
@@ -48,6 +50,10 @@ namespace kmodular
 
 
         public:
+            bool phaserEnabled;
+            bool delayEnabled;
+            bool reverbEnabled;
+
             KSynth() {}
             ~KSynth() {}
             void Init(float sampleRate);

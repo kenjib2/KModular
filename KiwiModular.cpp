@@ -31,6 +31,7 @@ MidiTrigger midiTrigger;
 // Add pan/balance
 // Implement access to all functions via MIDI
 // Make some MIDI CC translations in KSynth scale logorithmically
+// Phaser and Reverb in SRAM are causing audio crackling
 
 
 void InitTestPatch();
@@ -88,7 +89,7 @@ int main(void)
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 
 	synth.Init(hw.AudioSampleRate(), NUM_VOICES);
-    InitTestPatch2();
+    InitTestPatch();
     p_freq.Init(hw.knob1, 10.0f, 12000.0f, Parameter::LOGARITHMIC);
     p_delay.Init(hw.knob2, hw.AudioSampleRate() * .05, MAX_DELAY, Parameter::LOGARITHMIC);
 
@@ -112,10 +113,12 @@ void InitTestPatch()
     patch.pitchOffset = 0.0f;
     patch.level = 1.0f;
 
+    patch.delayEnabled = true;
     patch.delayTime = 0.5f;
     patch.delayLevel = 0.5f;
     patch.delayFeedback = 0.3f;
 
+    patch.reverbEnabled = true;
     patch.reverbLevel = 0.35f;
     patch.reverbFeedback = 0.82f;
     patch.reverbLpFreq = 12000.0f;
@@ -180,12 +183,14 @@ void InitTestPatch2()
     patch.pitchOffset = 0.0f;
     patch.level = 1.0f;
 
+    patch.delayEnabled = true;
     patch.delayTime = 0.25f;
     patch.delayLevel = 0.3f;
     patch.delayFeedback = 0.2f;
 
-    patch.reverbLevel = 0.35f;
-    patch.reverbFeedback = 0.82f;
+    patch.reverbEnabled = true;
+    patch.reverbLevel = 0.30f;
+    patch.reverbFeedback = 0.68f;
     patch.reverbLpFreq = 12000.0f;
 
     //patch.voiceLevel = 1.0f;

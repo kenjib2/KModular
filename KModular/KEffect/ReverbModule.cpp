@@ -24,6 +24,10 @@ namespace kmodular
 
     void ReverbModule::Process(const float* in, float* out, size_t sizeIn, size_t sizeOut)
     {
+        if (sizeIn < 2 || sizeOut < 2) {
+            return;
+        }
+
         float sendL = in[0] * level;
         float sendR = in[1] * level;
         float wetL = 0.0f;

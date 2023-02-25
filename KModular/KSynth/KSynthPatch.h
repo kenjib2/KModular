@@ -18,10 +18,12 @@ namespace kmodular
             float pitchOffset;
             float level;
 
+            bool delayEnabled;
             float delayTime;
             float delayLevel;
             float delayFeedback;
 
+            bool reverbEnabled;
             float reverbLevel;
             float reverbFeedback;
             float reverbLpFreq;

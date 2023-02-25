@@ -39,7 +39,7 @@ namespace kmodular
 
     void VCF::Process(const float* in, float* out, size_t sizeIn, size_t sizeOut)
     {
-        if (sizeOut < 2) {
+        if (sizeIn < 2 || sizeOut < 2) {
             return;
         }
 

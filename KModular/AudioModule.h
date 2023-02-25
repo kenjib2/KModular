@@ -28,6 +28,12 @@ namespace kmodular
         ReverbFeedback,
         ReverbLpFreq,
 
+        PhaserNumPoles,
+        PhaserLfoDepth,
+        PhaserFrequency,
+        PhaserAllPassFrequency,
+        PhaserFeedback,
+
         VoiceLevel,
 
         VcoWaveform,
