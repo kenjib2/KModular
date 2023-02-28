@@ -7,10 +7,10 @@ namespace kmodular
 
     typedef enum TriggerCommand
     {
-        NoteOn,
-        NoteOff,
-        ParamChange,
-        MidiControlChange,
+        TriggerNoteOn,
+        TriggerNoteOff,
+        TriggerParamChange,
+        TriggerMidiControlChange,
     } TriggerCommand;
 
 

@@ -2,10 +2,12 @@
 #define KEFFECT_REVERB_H
 
 
+#include "daisy_pod.h"
 #include "daisysp.h"
 #include "../AudioModule.h"
 
 
+using namespace daisy;
 using namespace daisysp;
 
 

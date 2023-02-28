@@ -61,7 +61,7 @@ namespace kmodular
 
         switch (command)
         {
-            case NoteOn:
+            case TriggerNoteOn:
                 noteTriggered = true;
                 if (env.IsRunning()) {
                     env.Retrigger(false);
@@ -70,11 +70,11 @@ namespace kmodular
                 }
                 break;
 
-            case NoteOff:
+            case TriggerNoteOff:
                 noteTriggered = false;
                 break;
 
-            case ParamChange:
+            case TriggerParamChange:
                 synthParam = (SynthParam)intVals[0];
                 waveform = Oscillator::WAVE_TRI;
                 switch (synthParam)

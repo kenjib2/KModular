@@ -72,7 +72,7 @@ namespace kmodular
 
         switch (command)
         {
-            case NoteOn:
+            case TriggerNoteOn:
                 noteTriggered = true;
                 currentMidiNote = intVals[0];
 
@@ -84,7 +84,7 @@ namespace kmodular
 
                 break;
 
-            case NoteOff:
+            case TriggerNoteOff:
                 noteTriggered = false;
 
                 for (size_t i = 0; i < vcos.size(); i++) {
@@ -95,7 +95,7 @@ namespace kmodular
 
                 break;
 
-            case ParamChange:
+            case TriggerParamChange:
                 synthParam = (SynthParam)intVals[0];
                 int vcoNumber;
 

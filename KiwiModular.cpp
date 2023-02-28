@@ -7,6 +7,9 @@
 #include "KModular/MidiTrigger.h"
 
 
+#define DEBUG
+
+
 using namespace daisy;
 using namespace daisysp;
 using namespace kmodular;
@@ -43,24 +46,25 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 
     if(hw.button1.RisingEdge())
     {
+        hw.seed.PrintLine("Note 1.");
 		int intVals[2] = { 40, 127 };
-        synth.Trigger(TriggerCommand::NoteOn, intVals, NULL);
+        synth.Trigger(TriggerCommand::TriggerNoteOn, intVals, NULL);
     }
     if(hw.button1.FallingEdge())
     {
 		int intVals[1] = { 40 };
-        synth.Trigger(TriggerCommand::NoteOff, intVals, NULL);
+        synth.Trigger(TriggerCommand::TriggerNoteOff, intVals, NULL);
     }
 
     if(hw.button2.RisingEdge())
     {
 		int intVals[2] = { 56, 127 };
-        synth.Trigger(TriggerCommand::NoteOn, intVals, NULL);
+        synth.Trigger(TriggerCommand::TriggerNoteOn, intVals, NULL);
     }
     if(hw.button2.FallingEdge())
     {
 		int intVals[1] = { 56 };
-        synth.Trigger(TriggerCommand::NoteOff, intVals, NULL);
+        synth.Trigger(TriggerCommand::TriggerNoteOff, intVals, NULL);
     }
 
 /*    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
@@ -87,13 +91,17 @@ int main(void)
 	hw.SetAudioBlockSize(4); // number of samples handled per callback
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 
-	synth.Init(hw.AudioSampleRate(), NUM_VOICES);
-    InitTestPatch2();
+	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
+    InitTestPatch();
     p_freq.Init(hw.knob1, 10.0f, 12000.0f, Parameter::LOGARITHMIC);
     p_delay.Init(hw.knob2, hw.AudioSampleRate() * .05, MAX_DELAY, Parameter::LOGARITHMIC);
 
     midiTrigger.Init(&hw);
     midiTrigger.AddMidiListener(&synth);
+
+    #ifdef DEBUG
+        hw.seed.StartLog(false);
+    #endif
 
     hw.StartAdc();
 	hw.StartAudio(AudioCallback);

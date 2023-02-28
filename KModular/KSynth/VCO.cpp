@@ -63,7 +63,7 @@ namespace kmodular
 
         switch (command)
         {
-            case NoteOn:
+            case TriggerNoteOn:
                 noteTriggered = true;
                 midiNote = intVals[0];
                 CalculateBaseFreq();
@@ -75,11 +75,11 @@ namespace kmodular
                 }
                 break;
 
-            case NoteOff:
+            case TriggerNoteOff:
                 noteTriggered = false;
                 break;
 
-            case ParamChange:
+            case TriggerParamChange:
                 synthParam = (SynthParam)intVals[0];
                 waveform = Oscillator::WAVE_TRI;
 

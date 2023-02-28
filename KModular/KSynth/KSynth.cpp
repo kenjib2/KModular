@@ -6,12 +6,13 @@ namespace kmodular
     
     void KSynth::Init(float sampleRate)
     {
-        Init(sampleRate, DEFAULT_NUM_VOICES);
+        Init(sampleRate, NULL, DEFAULT_NUM_VOICES);
     }
 
 
-    void KSynth::Init(float sampleRate, int numVoices)
+    void KSynth::Init(float sampleRate, DaisyPod* hw, int numVoices)
     {
+        this->hw = hw;
         this->sampleRate = sampleRate;
         this->ccSelectedVco = 1;
         for (int i = 0; i < numVoices; i++) {
@@ -19,7 +20,7 @@ namespace kmodular
             nextVoice.Init(sampleRate);
             voices.push_back(nextVoice);
         }
-        reverb.Init(sampleRate);
+//        reverb.Init(sampleRate);
         delay.Init(sampleRate);
 
         Reset();
@@ -30,11 +31,12 @@ namespace kmodular
     {
         level = 1.0f;
         pitchOffset = 0.0f;
+        midiChannel = 0;
 
         for (size_t i = 0; i < voices.size(); i++) {
             voices[i].Reset();
         }
-        reverb.Reset();
+//        reverb.Reset();
         delay.Reset();
     }
 
@@ -46,7 +48,6 @@ namespace kmodular
         }
 
         float result[2] = { 0.0f, 0.0f };
-
         for (size_t i = 0; i < voices.size(); i++) {
             float voiceOut[2];
             voices[i].Process(in, (float*)voiceOut, sizeIn, 2);
@@ -54,14 +55,17 @@ namespace kmodular
             result[1] += voiceOut[1];
         }
 
-        float delayOut[2];
-        delay.Process(result, delayOut, sizeIn, 2);
+        float fxOut[2];
+        delay.Process(result, fxOut, sizeIn, 2);
+        result[0] = fxOut[0];
+        result[1] = fxOut[1];
 
-        float reverbOut[2];
-        reverb.Process(delayOut, reverbOut, 2, 2);
+//        reverb.Process(result, fxOut, 2, 2);
+//        result[0] = fxOut[0];
+//        result[1] = fxOut[1];
 
-        out[0] = reverbOut[0] * level;
-        out[1] = reverbOut[1] * level;
+        out[0] = result[0] * level;
+        out[1] = result[1] * level;
     }
 
 
@@ -72,16 +76,17 @@ namespace kmodular
         float value[1] = { 0.0f };
         SynthParam synthParam;
 
+        char output[256];
         switch (command)
         {
-            case NoteOn:
+            case TriggerNoteOn:
                 voice = RequestVoice(intVals[0]);
                 if (voice != NULL) {
                     voice->Trigger(command, intVals, floatVals);
                 }
                 break;
 
-            case NoteOff:
+            case TriggerNoteOff:
                 for (size_t i = 0; i < voices.size(); i++) {
                     if (voices[i].noteTriggered && voices[i].currentMidiNote == intVals[0]) {
                         voices[i].Trigger(command, intVals, floatVals);
@@ -90,7 +95,7 @@ namespace kmodular
                 }
                 break;
 
-            case ParamChange:
+            case TriggerParamChange:
                 synthParam = (SynthParam)intVals[0];
 
                 // Handle voice level params
@@ -105,7 +110,7 @@ namespace kmodular
 
                 // Reverb params
                 } else if (synthParam >= ReverbLevel && synthParam <= ReverbLpFreq) {
-                    reverb.Trigger(command, intVals, floatVals);
+//                    reverb.Trigger(command, intVals, floatVals);
 
                 // Handle patch level params
                 } else {
@@ -128,7 +133,7 @@ namespace kmodular
                 }
                 break;
 
-            case MidiControlChange:
+            case TriggerMidiControlChange:
                 // intVals[0] is control number and intVals[1] is value.
                 switch(intVals[0])
                 {
@@ -154,7 +159,7 @@ namespace kmodular
                         // Volume.
                         param[0] = (int) SynthParam::Level;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 8:
                         // Balance.
@@ -185,7 +190,7 @@ namespace kmodular
                         param[0] = (int) SynthParam::VcoWaveform;
                         param[1] = ccSelectedVco;
                         param[2] = intVals[1];
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 17:
                         // CUSTOM -- VCO level
@@ -193,7 +198,7 @@ namespace kmodular
                         param[0] = (int) SynthParam::VcoLevel;
                         param[1] = ccSelectedVco;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 18:
                         // CUSTOM -- VCO pitch offset MSB
@@ -205,104 +210,104 @@ namespace kmodular
                         param[0] = (int) SynthParam::VcoEnvAttack;
                         param[1] = ccSelectedVco;
                         value[0] = (float)intVals[1] / 127 * MAX_ATTACK_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 20:
                         // CUSTOM -- VCO envelope decay
                         param[0] = (int) SynthParam::VcoEnvDecay;
                         param[1] = ccSelectedVco;
                         value[0] = (float)intVals[1] / 127 * MAX_DECAY_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 21:
                         // CUSTOM -- VCO envelope sustain
                         param[0] = (int) SynthParam::VcoEnvSustain;
                         param[1] = ccSelectedVco;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 22:
                         // CUSTOM -- VCO envelope release
                         param[0] = (int) SynthParam::VcoEnvRelease * MAX_RELEASE_TIME;
                         param[1] = ccSelectedVco;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 23:
                         // CUSTOM -- VCO envelope depth MSB
                         //param[0] = (int) SynthParam::VcoEnvDepth;
                         //param[1] = ccSelectedVco;
                         //value[0] = (float)intVals[i] / 127 * MAX_VCO_ENV_DEPTH;
-                        //Trigger(ParamChange, param, value);
+                        //Trigger(TriggerParamChange, param, value);
                         break;
                     case 24:
                         // CUSTOM -- VCO LFO waveform
                         param[0] = (int) SynthParam::VcoLfoWaveform;
                         param[1] = ccSelectedVco;
                         param[2] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 25:
                         // CUSTOM -- VCO LFO rate
                         param[0] = (int) SynthParam::VcoLfoRate;
                         param[1] = ccSelectedVco;
                         value[0] = (float)intVals[1] / 127 * MAX_LFO_RATE;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 26:
                         // CUSTOM -- VCO LFO depth MSB
                         //param[0] = (int) SynthParam::VcoLfoDepth;
                         //param[1] = ccSelectedVco;
                         //value[0] = (float)intVals[1] / 127 * MAX_VCO_LFO_DEPTH;
-                        //Trigger(ParamChange, param, value);
+                        //Trigger(TriggerParamChange, param, value);
                         break;
                     case 27:
                         // CUSTOM -- VCO White Noise Level
                         param[0] = (int) SynthParam::WhiteNoiseOscLevel;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 28:
                         // CUSTOM -- VCF Frequency MSB
                         //param[0] = (int) SynthParam::VcfFrequency;
                         //value[0] = (float)intVals[1] / 127 * (MAX_VCF_FREQUENCY - MIN_VCF_FREQUENCY) + MIN_VCF_FREQUENCY;
-                        //Trigger(ParamChange, param, value);
+                        //Trigger(TriggerParamChange, param, value);
                         break;
                     case 29:
                         // CUSTOM -- VCF Resonance
                         param[0] = (int) SynthParam::VcfResonance;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 30:
                         // CUSTOM -- VCF Envelope Attack
                         param[0] = (int) SynthParam::VcfEnvAttack;
                         value[0] = (float)intVals[1] / 127 * MAX_ATTACK_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 31:
                         // CUSTOM -- VCF Envelope Decay
                         param[0] = (int) SynthParam::VcfEnvDecay;
                         value[0] = (float)intVals[1] / 127 * MAX_DECAY_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 32:
                         // CUSTOM -- VCF Envelope Sustain
                         param[0] = (int) SynthParam::VcfEnvSustain;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 33:
                         // CUSTOM -- VCF Envelope Release
                         param[0] = (int) SynthParam::VcfEnvRelease;
                         value[0] = (float)intVals[1] / 127 * MAX_RELEASE_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 34:
                         // CUSTOM -- VCF Envelope Depth MSB
                         //param[0] = (int) SynthParam::VcfEnvDepth;
                         //value[0] = (float)intVals[1] / 127 * (MAX_VCF_FREQUENCY - MIN_VCF_FREQUENCY) + MIN_VCF_FREQUENCY;
-                        //Trigger(ParamChange, param, value);
+                        //Trigger(TriggerParamChange, param, value);
                         break;
                     case 35:
                         // CUSTOM -- VCF Envelope Depth LSB
@@ -311,19 +316,19 @@ namespace kmodular
                         // CUSTOM -- VCF LFO Waveform
                         param[0] = (int) SynthParam::VcfLfoWaveform;
                         param[1] = intVals[1];
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 37:
                         // CUSTOM -- VCF LFO Rate
                         param[0] = (int) SynthParam::VcfLfoRate;
                         value[0] = (float)intVals[1] / 127 * MAX_LFO_RATE;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 38:
                         // CUSTOM -- VCF LFO Depth MSB
                         //param[0] = (int) SynthParam::VcfLfoDepth;
                         //value[0] = (float)intVals[1] / 127 * (MAX_VCF_FREQUENCY - MIN_VCF_FREQUENCY) + MIN_VCF_FREQUENCY;
-                        //Trigger(ParamChange, param, value);
+                        //Trigger(TriggerParamChange, param, value);
                         break;
                     case 39:
                         // CUSTOM -- VCF LFO Depth LSB
@@ -332,43 +337,43 @@ namespace kmodular
                         // CUSTOM -- VCA Envelope Attack
                         param[0] = (int) SynthParam::VcaEnvAttack;
                         value[0] = (float)intVals[1] / 127 * MAX_ATTACK_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 41:
                         // CUSTOM -- VCA Envelope Decay
                         param[0] = (int) SynthParam::VcaEnvDecay;
                         value[0] = (float)intVals[1] / 127 * MAX_DECAY_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 42:
                         // CUSTOM -- VCA Envelope Sustain
                         param[0] = (int) SynthParam::VcaEnvSustain;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 43:
                         // CUSTOM -- VCA Envelope Release
                         param[0] = (int) SynthParam::VcaEnvRelease;
                         value[0] = (float)intVals[1] / 127 * MAX_RELEASE_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 44:
                         // CUSTOM -- VCA LFO Waveform
                         param[0] = (int) SynthParam::VcaLfoWaveform;
                         param[1] = intVals[1];
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 45:
                         // CUSTOM -- VCA LFO Rate
                         param[0] = (int) SynthParam::VcaLfoRate;
                         value[0] = (float)intVals[1] / 127 * MAX_LFO_RATE;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 46:
                         // CUSTOM -- VCA LFO Depth
                         param[0] = (int) SynthParam::VcaLfoDepth;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 47:
                         // CUSTOM -- Pitch offset LSB
@@ -377,13 +382,13 @@ namespace kmodular
                         // CUSTOM -- Delay Time
                         param[0] = (int) SynthParam::DelayTime;
                         value[0] = (float)intVals[1] / 127 * (MAX_DELAY_TIME - MIN_DELAY_TIME) + MIN_DELAY_TIME;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 49:
                         // CUSTOM -- Delay Level
                         param[0] = (int) SynthParam::DelayLevel;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 50:
                         // CUSTOM -- VCO pitch offset LSB
@@ -392,25 +397,25 @@ namespace kmodular
                         // CUSTOM -- Delay Feedback
                         param[0] = (int) SynthParam::DelayFeedback;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 52:
                         // CUSTOM -- Reverb Level
                         param[0] = (int) SynthParam::ReverbLevel;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 53:
                         // CUSTOM -- Reverb Feedback
                         param[0] = (int) SynthParam::ReverbFeedback;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 54:
                         // CUSTOM -- Reverb Low Pass Filter Frequency MSB
                         //param[0] = (int) SynthParam::ReverbLpFreq;
                         //value[0] = (float)intVals[1] / 127 * (MAX_VCF_FREQUENCY - MIN_VCF_FREQUENCY) + MIN_VCF_FREQUENCY;
-                        //Trigger(ParamChange, param, value);
+                        //Trigger(TriggerParamChange, param, value);
                         break;
                     case 55:
                         // CUSTOM -- VCO envelope depth LSB
@@ -449,25 +454,25 @@ namespace kmodular
                         // Sound Controller 2: Resonance
                         param[0] = (int) SynthParam::VcfResonance;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 72:
                         // Sound Controller 3: VCA Release Time
                         param[0] = (int) SynthParam::VcaEnvRelease;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 73:
                         // Sound Controller 4: VCA Attack
                         param[0] = (int) SynthParam::VcaEnvAttack;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 74:
                         // Sound Controller 5: Frequency Cutoff
                         param[0] = (int) SynthParam::VcfFrequency;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 75:
                         // Sound Controller 6
@@ -491,7 +496,7 @@ namespace kmodular
                         // Reverb send amount
                         param[0] = (int) SynthParam::ReverbLevel;
                         value[0] = (float)intVals[1] / 127;
-                        Trigger(ParamChange, param, value);
+                        Trigger(TriggerParamChange, param, value);
                         break;
                     case 92:
                         // Tremolo amount
@@ -541,16 +546,23 @@ namespace kmodular
 
     Voice* KSynth::RequestVoice(int midiNote)
     {
+        char output[256];
         // First if that note is already playing, retrigger it.
         for (size_t i = 0; i < voices.size(); i++) {
             if (!voices[i].IsAvailable() && voices[i].currentMidiNote == midiNote) {
+                sprintf(output, "1. Returning %d", i);
+                hw->seed.PrintLine(output);
                 return &voices[i];
             }
         }
 
         // Else return first available voice.
         for (size_t i = 0; i < voices.size(); i++) {
+            sprintf(output, "2. Voice %d is %d", i, voices[i].IsAvailable());
+            hw->seed.PrintLine(output);
             if (voices[i].IsAvailable()) {
+                sprintf(output, "3. Returning %d", i);
+                hw->seed.PrintLine(output);
                 return &voices[i];
             }
         }
@@ -571,175 +583,175 @@ namespace kmodular
         // Synth
         param[0] = (int) SynthParam::Level;
         value[0] = patch->level;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::PitchOffset;
         value[0] = patch->pitchOffset;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         // Voice
 //        param[0] = (int) SynthParam::VoiceLevel;
 //        param[1] = 1;
 //        value[0] = 1.0f;
-//        Trigger(ParamChange, param, value);
+//        Trigger(TriggerParamChange, param, value);
 
         // VCOs
         for (int i = 0; i < patch->numVcos; i++) {
             param[0] = (int) SynthParam::VcoWaveform;
             param[1] = i + 1;
             param[2] = patch->vcoWaveform[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoLevel;
             param[1] = i + 1;
             value[0] = patch->vcoLevel[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoPitchOffset;
             param[1] = i + 1;
             value[0] = patch->vcoPitchOffset[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoEnvAttack;
             param[1] = i + 1;
             value[0] = patch->vcoEnvAttack[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoEnvDecay;
             param[1] = i + 1;
             value[0] = patch->vcoEnvDecay[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoEnvSustain;
             param[1] = i + 1;
             value[0] = patch->vcoEnvSustain[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoEnvRelease;
             param[1] = i + 1;
             value[0] = patch->vcoEnvRelease[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoEnvDepth;
             param[1] = i + 1;
             value[0] = patch->vcoEnvRelease[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoLfoWaveform;
             param[1] = i + 1;
             param[2] = patch->vcoLfoWaveform[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoLfoRate;
             param[1] = i + 1;
             value[0] = patch->vcoLfoRate[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoLfoDepth;
             param[1] = i + 1;
             value[0] = patch->vcoLfoDepth[i];
-            Trigger(ParamChange, param, value);
+            Trigger(TriggerParamChange, param, value);
         }
 
         // White Noise
         param[0] = (int) SynthParam::WhiteNoiseOscLevel;
         value[0] = patch->whiteNoiseOscLevel;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         // VCF
         param[0] = (int) SynthParam::VcfFrequency;
         value[0] = patch->vcfFrequency;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfResonance;
         value[0] = patch->vcfResonance;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfEnvAttack;
         value[0] = patch->vcfEnvAttack;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfEnvDecay;
         value[0] = patch->vcfEnvDecay;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfEnvSustain;
         value[0] = patch->vcfEnvSustain;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfEnvRelease;
         value[0] = patch->vcfEnvRelease;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfEnvDepth;
         value[0] = patch->vcfEnvDepth;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfLfoWaveform;
         param[1] = patch->vcfLfoWaveform;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfLfoRate;
         value[0] = patch->vcfLfoRate;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcfLfoDepth;
         value[0] = patch->vcfLfoDepth;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         // VCA
         param[0] = (int) SynthParam::VcaEnvAttack;
         value[0] = patch->vcaEnvAttack;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcaEnvDecay;
         value[0] = patch->vcaEnvDecay;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcaEnvSustain;
         value[0] = patch->vcaEnvSustain;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcaEnvRelease;
         value[0] = patch->vcaEnvRelease;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcaLfoWaveform;
         param[1] = patch->vcaLfoWaveform;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcaLfoRate;
         value[0] = patch->vcaLfoRate;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::VcaLfoDepth;
         value[0] = patch->vcaLfoDepth;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         // Delay
         param[0] = (int) SynthParam::DelayTime;
         value[0] = patch->delayTime * sampleRate;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::DelayLevel;
         value[0] = patch->delayLevel;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::DelayFeedback;
         value[0] = patch->delayFeedback;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         // Reverb
         param[0] = (int) SynthParam::ReverbLevel;
         value[0] = patch->reverbLevel;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::ReverbFeedback;
         value[0] = patch->reverbFeedback;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
 
         param[0] = (int) SynthParam::ReverbLpFreq;
         value[0] = patch->reverbLpFreq;
-        Trigger(ParamChange, param, value);
+        Trigger(TriggerParamChange, param, value);
     }
 }

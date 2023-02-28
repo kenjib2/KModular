@@ -34,7 +34,7 @@ namespace kmodular
         switch (command)
         {
             SynthParam synthParam;
-            case ParamChange:
+            case TriggerParamChange:
                 synthParam = (SynthParam)intVals[0];
                 switch (synthParam)
                 {

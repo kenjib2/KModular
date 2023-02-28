@@ -38,11 +38,12 @@ namespace kmodular
         private:
             float           sampleRate;
             vector<Voice>   voices;
-            ReverbModule    reverb;
+//            ReverbModule    reverb;
             DelayModule     delay;
             float           level;
             float           pitchOffset;
             int             ccSelectedVco;
+            DaisyPod*       hw;
 
             Voice* RequestVoice(int midiNote);
 
@@ -51,7 +52,7 @@ namespace kmodular
             KSynth() {}
             ~KSynth() {}
             void Init(float sampleRate);
-            void Init(float sampleRate, int numVoices);
+            void Init(float sampleRate, DaisyPod* hw, int numVoices);
             void Reset();
             void Process(const float* in, float* out, size_t sizeIn = 2, size_t sizeOut = 2);
             void Trigger(TriggerCommand command, int* intVals, float* floatVals);

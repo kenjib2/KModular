@@ -46,7 +46,7 @@ namespace kmodular
                         // This is to avoid Max/MSP Note outs for now..
                         if(m->data[1] != 0)
                         {
-                            midiListeners[i]->Trigger(NoteOn, intVals, NULL);
+                            midiListeners[i]->Trigger(TriggerNoteOn, intVals, NULL);
                         }
                         break;
 
@@ -55,7 +55,7 @@ namespace kmodular
                         intVals[0] = off.note;
                         intVals[1] = off.velocity;
 
-                        midiListeners[i]->Trigger(NoteOff, intVals, NULL);
+                        midiListeners[i]->Trigger(TriggerNoteOff, intVals, NULL);
                         break;
 
                     // Unimplemented message types
@@ -73,7 +73,7 @@ namespace kmodular
                         controlChange = m->AsControlChange();
                         intVals[0] = controlChange.control_number;
                         intVals[1] = controlChange.value;
-                        midiListeners[i]->Trigger(MidiControlChange, intVals, NULL);
+                        midiListeners[i]->Trigger(TriggerMidiControlChange, intVals, NULL);
                         break;
 
                     default:

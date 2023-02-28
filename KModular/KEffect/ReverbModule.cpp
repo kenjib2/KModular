@@ -39,7 +39,7 @@ namespace kmodular
     {
         switch (command)
         {
-            case ParamChange:
+            case TriggerParamChange:
                 switch((SynthParam)intVals[0])
                 {
                     case ReverbLevel:
