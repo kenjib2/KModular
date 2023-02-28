@@ -34,6 +34,7 @@ MidiTrigger midiTrigger;
 // Add pan/balance
 // Implement access to all functions via MIDI
 // Make some MIDI CC translations in KSynth scale logorithmically
+// More than 2 voices introduces audio glitches
 
 
 void InitTestPatch();
