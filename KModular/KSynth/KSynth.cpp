@@ -20,7 +20,7 @@ namespace kmodular
             nextVoice.Init(sampleRate);
             voices.push_back(nextVoice);
         }
-//        reverb.Init(sampleRate);
+////        reverb.Init(sampleRate);
         delay.Init(sampleRate);
 
         Reset();
