@@ -95,5 +95,11 @@ namespace kmodular
     {
         return env.IsRunning();
     }
+
+
+    bool VCA::IsReleasing()
+    {
+        return env.GetCurrentSegment() == ADSR_SEG_RELEASE;
+    }
     
 }

@@ -20,7 +20,7 @@ namespace kmodular
             nextVoice.Init(sampleRate);
             voices.push_back(nextVoice);
         }
-////        reverb.Init(sampleRate);
+        reverb.Init(sampleRate);
         delay.Init(sampleRate);
 
         Reset();
@@ -36,7 +36,7 @@ namespace kmodular
         for (size_t i = 0; i < voices.size(); i++) {
             voices[i].Reset();
         }
-//        reverb.Reset();
+        reverb.Reset();
         delay.Reset();
     }
 
@@ -60,9 +60,9 @@ namespace kmodular
         result[0] = fxOut[0];
         result[1] = fxOut[1];
 
-//        reverb.Process(result, fxOut, 2, 2);
-//        result[0] = fxOut[0];
-//        result[1] = fxOut[1];
+        reverb.Process(result, fxOut, 2, 2);
+        result[0] = fxOut[0];
+        result[1] = fxOut[1];
 
         out[0] = result[0] * level;
         out[1] = result[1] * level;
@@ -76,7 +76,6 @@ namespace kmodular
         float value[1] = { 0.0f };
         SynthParam synthParam;
 
-        char output[256];
         switch (command)
         {
             case TriggerNoteOn:
@@ -90,6 +89,7 @@ namespace kmodular
                 for (size_t i = 0; i < voices.size(); i++) {
                     if (voices[i].noteTriggered && voices[i].currentMidiNote == intVals[0]) {
                         voices[i].Trigger(command, intVals, floatVals);
+                        RemovePlayingVoice(i);
                         break;
                     }
                 }
@@ -110,7 +110,7 @@ namespace kmodular
 
                 // Reverb params
                 } else if (synthParam >= ReverbLevel && synthParam <= ReverbLpFreq) {
-//                    reverb.Trigger(command, intVals, floatVals);
+                    reverb.Trigger(command, intVals, floatVals);
 
                 // Handle patch level params
                 } else {
@@ -546,32 +546,80 @@ namespace kmodular
 
     Voice* KSynth::RequestVoice(int midiNote)
     {
-        char output[256];
-        // First if that note is already playing, retrigger it.
+        size_t lowestIndex = 0;
+        int lowestNote = 128;
+        size_t highestIndex = 0;
+        int highestNote = -1;
+
+        // First if that note is already playing, retrigger it to preserve envelope/lfo position.
         for (size_t i = 0; i < voices.size(); i++) {
             if (!voices[i].IsAvailable() && voices[i].currentMidiNote == midiNote) {
-                sprintf(output, "1. Returning %d", i);
-                hw->seed.PrintLine(output);
+                RemovePlayingVoice(i);
+                AddPlayingVoice(i, midiNote);
                 return &voices[i];
             }
         }
 
         // Else return first available voice.
         for (size_t i = 0; i < voices.size(); i++) {
-            sprintf(output, "2. Voice %d is %d", i, voices[i].IsAvailable());
-            hw->seed.PrintLine(output);
             if (voices[i].IsAvailable()) {
-                sprintf(output, "3. Returning %d", i);
-                hw->seed.PrintLine(output);
+                AddPlayingVoice(i, midiNote);
                 return &voices[i];
             }
         }
 
-        // Find the lowest and highest notes to make sure that we don't return them.
-        // These will be the most noticeable notes to steals.
+        // Else return first releasing voice.
+        for (size_t i = 0; i < voices.size(); i++) {
+            if (voices[i].IsReleasing()) {
+                RemovePlayingVoice(i);
+                AddPlayingVoice(i, midiNote);
+                return &voices[i];
+            } else {
+                // Find the lowest and highest playing notes to make sure that we don't return them in the next step.
+                // These will be the most audibly conspicuous notes to steal.
+                if (voices[i].currentMidiNote < lowestNote) {
+                    lowestIndex = i;
+                    lowestNote = voices[i].currentMidiNote;
+                }
+                if (voices[i].currentMidiNote > highestNote) {
+                    highestIndex = i;
+                    highestNote = voices[i].currentMidiNote;
+                }
+            }
+        }
 
-        // If no voices are available, return the oldest note (not including lowest nor highest).
+        // If no voices are available, return the oldest note.
+        // We have to replace a playing note that is neither lowest nor highest.
+        for (int i = 0; i < (int)playingIndices.size(); i++) {
+            int playingIndex = playingIndices[i];
+            if (playingIndex != (int)lowestIndex && playingIndex != (int)highestIndex) {
+                Voice* voice = &voices[playingIndex];
+                RemovePlayingVoice(playingIndex);
+                AddPlayingVoice(playingIndex, midiNote);
+                return voice;
+            }
+        }
+
         return NULL;
+    }
+
+
+    void KSynth::AddPlayingVoice(int index, int midiNote)
+    {
+        playingIndices.push_back(index);
+        playingNotes.push_back(midiNote);
+    }
+
+
+    void KSynth::RemovePlayingVoice(int index)
+    {
+        for (size_t i = 0; i < playingIndices.size(); i++) {
+            if (playingIndices[i] == index) {
+                playingIndices.erase(playingIndices.begin()+i);
+                playingNotes.erase(playingNotes.begin()+i);
+                break;
+            }
+        }
     }
 
 

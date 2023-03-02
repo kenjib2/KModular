@@ -29,6 +29,7 @@ namespace kmodular
             void Process(const float* in, float* out, size_t sizeIn = 2, size_t sizeOut = 2);
             void Trigger(TriggerCommand command, int* intVals, float* floatVals);
             bool IsPlaying();
+            bool IsReleasing();
     };
 
 }

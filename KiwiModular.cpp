@@ -15,7 +15,7 @@ using namespace daisysp;
 using namespace kmodular;
 
 
-const int NUM_VOICES = 2;
+const int NUM_VOICES = 3;
 float volume = 1.0f;
 
 DaisyPod    hw;
@@ -47,7 +47,6 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 
     if(hw.button1.RisingEdge())
     {
-        hw.seed.PrintLine("Note 1.");
 		int intVals[2] = { 40, 127 };
         synth.Trigger(TriggerCommand::TriggerNoteOn, intVals, NULL);
     }
@@ -89,7 +88,7 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 int main(void)
 {
 	hw.Init();
-	hw.SetAudioBlockSize(4); // number of samples handled per callback
+	hw.SetAudioBlockSize(128); // number of samples handled per callback
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 
 	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
@@ -119,7 +118,7 @@ void InitTestPatch()
     KSynthPatch patch;
     patch.patchName = "TestPatch";
     patch.pitchOffset = 0.0f;
-    patch.level = 1.0f;
+    patch.level = 0.9f;
 
     patch.delayTime = 0.5f;
     patch.delayLevel = 0.5f;
@@ -134,7 +133,7 @@ void InitTestPatch()
     patch.numVcos = 2;
 
     patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SAW);
-    patch.vcoLevel.push_back(0.7f);
+    patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(0.0f);
     patch.vcoEnvAttack.push_back(0.002f);
     patch.vcoEnvDecay.push_back(0.0f);
@@ -146,7 +145,7 @@ void InitTestPatch()
     patch.vcoLfoDepth.push_back(0.03f);
 
     patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SAW);
-    patch.vcoLevel.push_back(0.7f);
+    patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(-0.007f);
     patch.vcoEnvAttack.push_back(0.002f);
     patch.vcoEnvDecay.push_back(0.0f);
@@ -187,7 +186,7 @@ void InitTestPatch2()
     KSynthPatch patch;
     patch.patchName = "TestPatch2";
     patch.pitchOffset = 0.0f;
-    patch.level = 1.0f;
+    patch.level = 0.9f;
 
     patch.delayTime = 0.25f;
     patch.delayLevel = 0.3f;
@@ -202,7 +201,7 @@ void InitTestPatch2()
     patch.numVcos = 2;
 
     patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SQUARE);
-    patch.vcoLevel.push_back(0.7f);
+    patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(0.0f);
     patch.vcoEnvAttack.push_back(0.002f);
     patch.vcoEnvDecay.push_back(0.0f);
@@ -214,7 +213,7 @@ void InitTestPatch2()
     patch.vcoLfoDepth.push_back(0.0f);
 
     patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SQUARE);
-    patch.vcoLevel.push_back(0.7f);
+    patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(-0.007f);
     patch.vcoEnvAttack.push_back(0.002f);
     patch.vcoEnvDecay.push_back(0.0f);

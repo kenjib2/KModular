@@ -157,4 +157,10 @@ namespace kmodular
         return !vca.IsPlaying();
     }
 
+
+    bool Voice::IsReleasing()
+    {
+        return vca.IsReleasing();
+    }
+
 }

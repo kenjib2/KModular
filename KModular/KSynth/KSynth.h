@@ -38,14 +38,18 @@ namespace kmodular
         private:
             float           sampleRate;
             vector<Voice>   voices;
-//            ReverbModule    reverb;
+            ReverbModule    reverb;
             DelayModule     delay;
             float           level;
             float           pitchOffset;
             int             ccSelectedVco;
             DaisyPod*       hw;
+            vector<int>     playingIndices;
+            vector<int>     playingNotes;
 
             Voice* RequestVoice(int midiNote);
+            void   AddPlayingVoice(int index, int midiNote);
+            void   RemovePlayingVoice(int index);
 
 
         public:
