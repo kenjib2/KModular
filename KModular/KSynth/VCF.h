@@ -21,8 +21,7 @@ namespace kmodular
             float           frequency;
             float           resonance;
             float           envDepth;
-            MoogLadder      filtL;
-            MoogLadder      filtR;
+            MoogLadder      filter;
             Adsr            env;
             Oscillator      lfo;
     

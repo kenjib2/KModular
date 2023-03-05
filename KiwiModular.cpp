@@ -15,18 +15,23 @@ using namespace daisysp;
 using namespace kmodular;
 
 
-const int NUM_VOICES = 3;
+const int NUM_VOICES = 4;
+#ifdef DEBUG
+    const int MONITOR_CYCLES = 100;
+    int monitorCycle = 0;
+#endif
 float volume = 1.0f;
 
 DaisyPod    hw;
 KSynth      synth;
-Parameter   p_freq;
-Parameter   p_delay;
 MidiTrigger midiTrigger;
+#ifdef DEBUG
+    CpuLoadMeter cpuLoadMeter;
+#endif
 
 
 // TODO
-// Add voice stealing -- replace oldest note, never replace bottom note.
+// Figure out my some NoteOff signals don't get through
 // make VCO/VCA/VCF mods logorithmic?
 // Only listen to set midi channel
 // Add velocity to NoteOn
@@ -34,7 +39,6 @@ MidiTrigger midiTrigger;
 // Add pan/balance
 // Implement access to all functions via MIDI
 // Make some MIDI CC translations in KSynth scale logorithmically
-// More than 2 voices introduces audio glitches
 
 
 void InitTestPatch();
@@ -43,6 +47,10 @@ void InitTestPatch2();
 
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
 {
+#ifdef DEBUG
+  	cpuLoadMeter.OnBlockStart();
+#endif
+
     hw.ProcessDigitalControls();
 
     if(hw.button1.RisingEdge())
@@ -67,14 +75,6 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
         synth.Trigger(TriggerCommand::TriggerNoteOff, intVals, NULL);
     }
 
-/*    int cutoffParam[1] = { (int) SynthParam::VcfFrequency };
-    float cutoff[1] = { p_freq.Process() };
-    synth.Trigger(ParamChange, cutoffParam, cutoff);
-
-    int delayParam[1] = { (int) SynthParam::DelayTime };
-    float delayTime[1] = { p_delay.Process() };
-    synth.Trigger(ParamChange, delayParam, delayTime);
-*/
 	for (size_t i = 0; i < size; i++)
 	{
 		float outSamples[2];
@@ -82,6 +82,20 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 		out[0][i] = outSamples[0] * volume;
 		out[1][i] = outSamples[1] * volume;
 	}
+
+#ifdef DEBUG
+	cpuLoadMeter.OnBlockEnd();
+
+	monitorCycle++;	
+	if (monitorCycle >= MONITOR_CYCLES) {
+		int min = cpuLoadMeter.GetMinCpuLoad() * 100;
+		int avg = cpuLoadMeter.GetAvgCpuLoad() * 100;
+		int max = cpuLoadMeter.GetMaxCpuLoad() * 100;
+		cpuLoadMeter.Reset();
+		monitorCycle = 0;
+        hw.seed.PrintLine("Min: %d, Avg: %d, Max: %d", min, avg, max);
+	}
+#endif
 }
 
 
@@ -93,14 +107,13 @@ int main(void)
 
 	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
     InitTestPatch();
-    p_freq.Init(hw.knob1, 10.0f, 12000.0f, Parameter::LOGARITHMIC);
-    p_delay.Init(hw.knob2, hw.AudioSampleRate() * .05, MAX_DELAY, Parameter::LOGARITHMIC);
 
     midiTrigger.Init(&hw);
     midiTrigger.AddMidiListener(&synth);
 
     #ifdef DEBUG
         hw.seed.StartLog(false);
+    	cpuLoadMeter.Init(hw.AudioSampleRate(), hw.AudioBlockSize());
     #endif
 
     hw.StartAdc();

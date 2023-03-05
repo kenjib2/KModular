@@ -45,24 +45,25 @@ namespace kmodular
             return;
         }
 
-        float vcoOut[2] = { 0.0f, 0.0f };
+        float vcoOut = 0.0f;
         for (size_t i = 0; i < vcos.size(); i++) {
-            float nextOut[2] = { 0.0f, 0.0f };
-            vcos[i].Process(in, nextOut, sizeIn, 2);
-            vcoOut[0] += nextOut[0];
-            vcoOut[1] += nextOut[1];
+            float nextOut = 0.0f;
+            vcos[i].Process(in, &nextOut, sizeIn, 1);
+            vcoOut += nextOut;
         }
-        float whiteNoiseOut[2] = { 0.0f, 0.0f };
-        whiteNoise.Process(in, whiteNoiseOut, sizeIn, 2);
-        vcoOut[0] += whiteNoiseOut[0];
-        vcoOut[1] += whiteNoiseOut[1];
-        float vcfOut[2];
-        vcf.Process(vcoOut, vcfOut, 2, 2);
-        float vcaOut[2];
-        vca.Process(vcfOut, vcaOut, 2, 2);
 
-        out[0] = vcaOut[0] * level;
-        out[1] = vcaOut[1] * level;
+        float whiteNoiseOut = 0.0f;
+        whiteNoise.Process(in, &whiteNoiseOut, sizeIn, 1);
+        vcoOut += whiteNoiseOut;
+
+        float vcfOut = 0.0f;
+        vcf.Process(&vcoOut, &vcfOut, 1, 1);
+
+        float vcaOut = 0.0f;
+        vca.Process(&vcfOut, &vcaOut, 1, 1);
+
+        out[0] = vcaOut * level;
+        out[1] = vcaOut * level;
     }
 
 

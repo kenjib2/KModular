@@ -6,8 +6,7 @@ namespace kmodular
     
     void VCF::Init(float sampleRate)
     {
-        filtL.Init(sampleRate);
-        filtR.Init(sampleRate);
+        filter.Init(sampleRate);
         env.Init(sampleRate);
         lfo.Init(sampleRate);
 
@@ -21,10 +20,8 @@ namespace kmodular
 
         frequency = 18000.0f;
         resonance = 0.0f;
-        filtL.SetRes(resonance);
-        filtL.SetFreq(frequency);
-        filtR.SetRes(resonance);
-        filtR.SetFreq(frequency);
+        filter.SetRes(resonance);
+        filter.SetFreq(frequency);
 
         env.SetAttackTime(0.002f);
         env.SetDecayTime(0.0f);
@@ -39,18 +36,16 @@ namespace kmodular
 
     void VCF::Process(const float* in, float* out, size_t sizeIn, size_t sizeOut)
     {
-        if (sizeOut < 2) {
+        if (sizeOut < 1 || sizeIn < 1) {
             return;
         }
 
         float envAmount = env.Process(noteTriggered) * envDepth;
         float lfoAmount = 1.0f - lfo.Process();
         float computedFrequency = frequency * lfoAmount + (18000 - frequency) * envAmount ;
-        filtL.SetFreq(computedFrequency);
-        filtR.SetFreq(computedFrequency);
+        filter.SetFreq(computedFrequency);
 
-        out[0] = filtL.Process(in[0]);
-        out[1] = filtR.Process(in[1]);
+        out[0] = filter.Process(in[0]);
     }
 
 
@@ -81,13 +76,11 @@ namespace kmodular
                 {
                     case VcfFrequency:
                         frequency = floatVals[0];
-                        filtL.SetFreq(frequency);
-                        filtR.SetFreq(frequency);
+                        filter.SetFreq(frequency);
                         break;
                     case VcfResonance:
                         resonance = floatVals[0];
-                        filtL.SetRes(resonance);
-                        filtR.SetRes(resonance);
+                        filter.SetRes(resonance);
                         break;
 
                     case VcfEnvAttack:

@@ -30,11 +30,12 @@ namespace kmodular
 
     void VCA::Process(const float* in, float* out, size_t sizeIn, size_t sizeOut)
     {
+        if (sizeOut < 1 || sizeIn < 1) {
+            return;
+        }
         float envAmount = env.Process(noteTriggered);
         float lfoAmount = lfo.Process();
-        for (size_t i = 0; i < sizeIn && i < sizeOut; i++) {
-            out[i] = in[i] * envAmount * (1 - lfoAmount);
-        }
+        out[0] = in[0] * envAmount * (1 - lfoAmount);
     }
 
 

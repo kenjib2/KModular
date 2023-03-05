@@ -40,7 +40,7 @@ namespace kmodular
 
     void VCO::Process(const float* in, float* out, size_t sizeIn, size_t sizeOut)
     {
-        if (sizeOut < 2) {
+        if (sizeOut < 1) {
             return;
         }
 
@@ -52,7 +52,6 @@ namespace kmodular
 
         float result = osc.Process();
         out[0] = result;
-        out[1] = result;
     }
 
 
