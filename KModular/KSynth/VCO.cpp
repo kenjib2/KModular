@@ -86,7 +86,7 @@ namespace kmodular
                 {
                     case VcoWaveform:
                         waveform = (uint8_t)intVals[2];
-                        lfo.SetWaveform(waveform);
+                        osc.SetWaveform(waveform);
                         break;
                     case VcoLevel:
                         osc.SetAmp(floatVals[0]);

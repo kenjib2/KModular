@@ -299,7 +299,7 @@ void InitTestPatch2()
 void InitTestPatch3()
 {
     KSynthPatch patch;
-    patch.patchName = "TestPatch3";
+    patch.patchName = "Rewind";
     patch.pitchOffset = 0.0f;
     patch.level = 0.5f;
 
@@ -313,8 +313,8 @@ void InitTestPatch3()
     patch.delayLevel = 0.0f;
     patch.delayFeedback = 0.2f;
 
-    patch.reverbLevel = 0.15f;
-    patch.reverbFeedback = 0.5f;
+    patch.reverbLevel = 0.5f;
+    patch.reverbFeedback = 0.85f;
     patch.reverbLpFreq = 12000.0f;
 
     patch.numVcos = 2;
@@ -326,40 +326,40 @@ void InitTestPatch3()
     patch.vcoEnvDecay.push_back(0.0f);
     patch.vcoEnvSustain.push_back(1.0f);
     patch.vcoEnvRelease.push_back(0.002f);
-    patch.vcoEnvDepth.push_back(0.01f);
+    patch.vcoEnvDepth.push_back(0.0f);
     patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
     patch.vcoLfoRate.push_back(0.3f);
-    patch.vcoLfoDepth.push_back(0.0f);
+    patch.vcoLfoDepth.push_back(0.01f);
 
     patch.vcoWaveform.push_back((int) Oscillator::WAVE_SAW);
     patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(0.0f);
-    patch.vcoEnvAttack.push_back(0.002f);
+    patch.vcoEnvAttack.push_back(0.3f);
     patch.vcoEnvDecay.push_back(0.0f);
     patch.vcoEnvSustain.push_back(1.0f);
-    patch.vcoEnvRelease.push_back(0.002f);
-    patch.vcoEnvDepth.push_back(0.0f);
-    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoEnvRelease.push_back(4.0f);
+    patch.vcoEnvDepth.push_back(1.0f);
+    patch.vcoLfoWaveform.push_back((int)Oscillator::WAVE_TRI);
     patch.vcoLfoRate.push_back(0.3f);
     patch.vcoLfoDepth.push_back(0.0f);
 
     patch.whiteNoiseOscLevel = 0.0f;
 
-    patch.vcfFrequency = 14000.0f;
-    patch.vcfResonance = 0.0f;
-    patch.vcfEnvAttack = 0.002f;
+    patch.vcfFrequency = 1000.0f;
+    patch.vcfResonance = 0.2f;
+    patch.vcfEnvAttack = 2.0f;
     patch.vcfEnvDecay = 0.0f;
     patch.vcfEnvSustain = 1.0f;
-    patch.vcfEnvRelease = 0.002f;
-    patch.vcfEnvDepth = 0.0f;
+    patch.vcfEnvRelease = 0.2f;
+    patch.vcfEnvDepth = 0.7f;
     patch.vcfLfoWaveform = (int) Oscillator::WAVE_TRI;
     patch.vcfLfoRate = 0.3f;
     patch.vcfLfoDepth = 0.0f;
 
-    patch.vcaEnvAttack = 0.002f;
+    patch.vcaEnvAttack = 0.08f;
     patch.vcaEnvDecay = 0.0f;
     patch.vcaEnvSustain = 1.0f;
-    patch.vcaEnvRelease = 0.002f;
+    patch.vcaEnvRelease = 0.2f;
     patch.vcaLfoWaveform = (int) Oscillator::WAVE_TRI;
     patch.vcaLfoRate = 0.3f;
     patch.vcaLfoDepth = 0.0f;
