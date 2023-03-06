@@ -25,12 +25,15 @@ float volume = 1.0f;
 DaisyPod    hw;
 KSynth      synth;
 MidiTrigger midiTrigger;
+Parameter knob1;
+Parameter knob2;
 #ifdef DEBUG
     CpuLoadMeter cpuLoadMeter;
 #endif
 
 
 // TODO
+// With patch2 some voices don't play on subsequent notes -- something to do with retriggering envelope? If you hold down a note and play a second note after decay, the 2nd note wont sound.
 // Figure out my some NoteOff signals don't get through
 // make VCO/VCA/VCF mods logorithmic?
 // Only listen to set midi channel
@@ -75,6 +78,16 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
         synth.Trigger(TriggerCommand::TriggerNoteOff, intVals, NULL);
     }
 
+    float floatVals[1];
+    int intVals[1];
+    intVals[0] = SynthParam::ChorusAmount;
+    floatVals[0] = knob1.Process();
+//    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);
+
+    intVals[0] = SynthParam::ChorusLfoFreq;
+    floatVals[0] = knob2.Process();
+//    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);
+
 	for (size_t i = 0; i < size; i++)
 	{
 		float outSamples[2];
@@ -105,6 +118,9 @@ int main(void)
 	hw.SetAudioBlockSize(128); // number of samples handled per callback
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 
+    knob1.Init(hw.knob1, 0, 1, Parameter::LINEAR);
+    knob2.Init(hw.knob2, 0, 1, Parameter::LINEAR);
+
 	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
     InitTestPatch();
 
@@ -132,6 +148,12 @@ void InitTestPatch()
     patch.patchName = "TestPatch";
     patch.pitchOffset = 0.0f;
     patch.level = 0.9f;
+
+    patch.chorusAmount = 0.f;
+    patch.chorusDelay = 0.75f;
+    patch.chorusFeedback = 0.2f;
+    patch.chorusLfoFreq = 0.3f;
+    patch.chorusLfoDepth = 0.9f;
 
     patch.delayTime = 0.5f;
     patch.delayLevel = 0.5f;
@@ -200,6 +222,12 @@ void InitTestPatch2()
     patch.patchName = "TestPatch2";
     patch.pitchOffset = 0.0f;
     patch.level = 0.9f;
+
+    patch.chorusAmount = 0.0f;
+    patch.chorusDelay = 0.75f;
+    patch.chorusFeedback = 0.2f;
+    patch.chorusLfoFreq = 0.3f;
+    patch.chorusLfoDepth = 0.9f;
 
     patch.delayTime = 0.25f;
     patch.delayLevel = 0.3f;

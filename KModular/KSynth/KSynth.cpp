@@ -20,8 +20,9 @@ namespace kmodular
             nextVoice.Init(sampleRate);
             voices.push_back(nextVoice);
         }
-        reverb.Init(sampleRate);
+        chorus.Init(sampleRate);
         delay.Init(sampleRate);
+        reverb.Init(sampleRate);
 
         Reset();
     }
@@ -36,8 +37,9 @@ namespace kmodular
         for (size_t i = 0; i < voices.size(); i++) {
             voices[i].Reset();
         }
-        reverb.Reset();
+        chorus.Reset();
         delay.Reset();
+        reverb.Reset();
     }
 
 
@@ -56,6 +58,10 @@ namespace kmodular
         }
 
         float fxOut[2];
+        chorus.Process(result, fxOut, sizeIn, 2);
+        result[0] = fxOut[0];
+        result[1] = fxOut[1];
+
         delay.Process(result, fxOut, sizeIn, 2);
         result[0] = fxOut[0];
         result[1] = fxOut[1];
@@ -103,6 +109,10 @@ namespace kmodular
                     for (size_t i = 0; i < voices.size(); i++) {
                         voices[i].Trigger(command, intVals, floatVals);
                     }
+
+                // Chorus params
+                } else if (synthParam >= ChorusAmount && synthParam <= ChorusLfoDepth) {
+                    chorus.Trigger(command, intVals, floatVals);
 
                 // Delay params
                 } else if (synthParam >= DelayTime && synthParam <= DelayFeedback) {
@@ -774,6 +784,27 @@ namespace kmodular
 
         param[0] = (int) SynthParam::VcaLfoDepth;
         value[0] = patch->vcaLfoDepth;
+        Trigger(TriggerParamChange, param, value);
+
+        // Chorus
+        param[0] = (int) SynthParam::ChorusAmount;
+        value[0] = patch->chorusAmount;
+        Trigger(TriggerParamChange, param, value);
+
+        param[0] = (int) SynthParam::ChorusDelay;
+        value[0] = patch->chorusDelay;
+        Trigger(TriggerParamChange, param, value);
+
+        param[0] = (int) SynthParam::ChorusFeedback;
+        value[0] = patch->chorusFeedback;
+        Trigger(TriggerParamChange, param, value);
+
+        param[0] = (int) SynthParam::ChorusLfoFreq;
+        value[0] = patch->chorusLfoFreq;
+        Trigger(TriggerParamChange, param, value);
+
+        param[0] = (int) SynthParam::ChorusLfoDepth;
+        value[0] = patch->chorusLfoDepth;
         Trigger(TriggerParamChange, param, value);
 
         // Delay

@@ -2,7 +2,7 @@
 TARGET = KenjiSynth
 
 # Sources
-CPP_SOURCES = KiwiModular.cpp KModular/KSynth/KSynth.cpp KModular/KSynth/Voice.cpp KModular/KSynth/VCO.cpp KModular/KSynth/WhiteNoiseOsc.cpp KModular/KSynth/VCF.cpp KModular/KSynth/VCA.cpp KModular/KEffect/ReverbModule.cpp KModular/Keffect/DelayModule.cpp KModular/MidiTrigger.cpp
+CPP_SOURCES = KiwiModular.cpp KModular/KSynth/KSynth.cpp KModular/KSynth/Voice.cpp KModular/KSynth/VCO.cpp KModular/KSynth/WhiteNoiseOsc.cpp KModular/KSynth/VCF.cpp KModular/KSynth/VCA.cpp KModular/KEffect/ReverbModule.cpp KModular/Keffect/DelayModule.cpp KModular/Keffect/ChorusModule.cpp KModular/MidiTrigger.cpp
 
 # Library Locations
 LIBDAISY_DIR = ../../libDaisy/

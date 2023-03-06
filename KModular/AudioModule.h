@@ -20,6 +20,12 @@ namespace kmodular
         PitchOffset,
         Level,
 
+        ChorusAmount,
+        ChorusDelay,
+        ChorusFeedback,
+        ChorusLfoFreq,
+        ChorusLfoDepth,
+
         DelayTime,
         DelayLevel,
         DelayFeedback,

@@ -18,6 +18,12 @@ namespace kmodular
             float pitchOffset;
             float level;
 
+            float chorusAmount;
+            float chorusDelay;
+            float chorusFeedback;
+            float chorusLfoFreq;
+            float chorusLfoDepth;
+
             float delayTime;
             float delayLevel;
             float delayFeedback;
@@ -27,7 +33,7 @@ namespace kmodular
             float reverbLpFreq;
 
             int numVcos;
-            vector<int> vcoWaveform;
+            vector<int>    vcoWaveform;
             vector<float>  vcoLevel;
             vector<float>  vcoPitchOffset;
             vector<float>  vcoEnvAttack;
@@ -35,7 +41,7 @@ namespace kmodular
             vector<float>  vcoEnvSustain;
             vector<float>  vcoEnvRelease;
             vector<float>  vcoEnvDepth;
-            vector<int>  vcoLfoWaveform;
+            vector<int>    vcoLfoWaveform;
             vector<float>  vcoLfoRate;
             vector<float>  vcoLfoDepth;
 

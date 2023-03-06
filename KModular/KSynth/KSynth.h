@@ -9,8 +9,9 @@
 #include "daisysp.h"
 #include "../AudioModule.h"
 #include "Voice.h"
-#include "../KEffect/ReverbModule.h"
+#include "../KEffect/ChorusModule.h"
 #include "../KEffect/DelayModule.h"
+#include "../KEffect/ReverbModule.h"
 #include "KSynthPatch.h"
 
 
@@ -38,8 +39,9 @@ namespace kmodular
         private:
             float           sampleRate;
             vector<Voice>   voices;
-            ReverbModule    reverb;
+            ChorusModule    chorus;
             DelayModule     delay;
+            ReverbModule    reverb;
             float           level;
             float           pitchOffset;
             int             ccSelectedVco;
