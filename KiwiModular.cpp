@@ -33,6 +33,7 @@ Parameter knob2;
 
 
 // TODO
+// Voice level isn't working when less than 1.0f
 // With patch2 some voices don't play on subsequent notes -- something to do with retriggering envelope? If you hold down a note and play a second note after decay, the 2nd note wont sound.
 // Figure out my some NoteOff signals don't get through
 // make VCO/VCA/VCF mods logorithmic?
@@ -80,11 +81,11 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 
     float floatVals[1];
     int intVals[1];
-    intVals[0] = SynthParam::ChorusAmount;
+    intVals[0] = SynthParam::VcfFrequency;
     floatVals[0] = knob1.Process();
 //    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);
 
-    intVals[0] = SynthParam::ChorusLfoFreq;
+    intVals[0] = SynthParam::VcfResonance;
     floatVals[0] = knob2.Process();
 //    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);
 
@@ -118,7 +119,7 @@ int main(void)
 	hw.SetAudioBlockSize(128); // number of samples handled per callback
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 
-    knob1.Init(hw.knob1, 0, 1, Parameter::LINEAR);
+    knob1.Init(hw.knob1, 80, 18000, Parameter::LOGARITHMIC);
     knob2.Init(hw.knob2, 0, 1, Parameter::LINEAR);
 
 	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
@@ -147,7 +148,7 @@ void InitTestPatch()
     KSynthPatch patch;
     patch.patchName = "TestPatch";
     patch.pitchOffset = 0.0f;
-    patch.level = 0.9f;
+    patch.level = 0.2f;
 
     patch.chorusAmount = 0.f;
     patch.chorusDelay = 0.75f;
@@ -221,7 +222,7 @@ void InitTestPatch2()
     KSynthPatch patch;
     patch.patchName = "TestPatch2";
     patch.pitchOffset = 0.0f;
-    patch.level = 0.9f;
+    patch.level = 0.4f;
 
     patch.chorusAmount = 0.0f;
     patch.chorusDelay = 0.75f;

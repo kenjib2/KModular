@@ -23,7 +23,7 @@ using namespace std;
 namespace kmodular
 {
     
-    const int DEFAULT_NUM_VOICES = 8;
+    const int DEFAULT_NUM_VOICES = 4;
     const float MAX_ATTACK_TIME = 4.0f;
     const float MAX_DECAY_TIME = 4.0f;
     const float MAX_RELEASE_TIME = 4.0f;

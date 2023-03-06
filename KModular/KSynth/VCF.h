@@ -6,6 +6,7 @@
 
 #include "daisysp.h"
 #include "../AudioModule.h"
+#include "moogladder.h"
 
 
 using namespace daisysp;
@@ -17,13 +18,13 @@ namespace kmodular
     class VCF: public AudioModule
     {
         private:
-            bool            noteTriggered;
-            float           frequency;
-            float           resonance;
-            float           envDepth;
-            MoogLadder      filter;
-            Adsr            env;
-            Oscillator      lfo;
+            bool                   noteTriggered;
+            float                  frequency;
+            float                  resonance;
+            float                  envDepth;
+            infrasonic::MoogLadder filter;
+            Adsr                   env;
+            Oscillator             lfo;
     
         public:
             VCF() {}
