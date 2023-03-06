@@ -692,7 +692,7 @@ namespace kmodular
 
             param[0] = (int) SynthParam::VcoEnvDepth;
             param[1] = i + 1;
-            value[0] = patch->vcoEnvRelease[i];
+            value[0] = patch->vcoEnvDepth[i];
             Trigger(TriggerParamChange, param, value);
 
             param[0] = (int) SynthParam::VcoLfoWaveform;

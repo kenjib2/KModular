@@ -49,6 +49,7 @@ Parameter knob2;
 
 void InitTestPatch();
 void InitTestPatch2();
+void InitTestPatch3();
 
 
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
@@ -128,7 +129,7 @@ int main(void)
     knob2.Init(hw.knob2, 0, 1, Parameter::LINEAR);
 
 	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
-    InitTestPatch();
+    InitTestPatch3();
 
     limiterL.Init();
     limiterR.Init();
@@ -174,7 +175,7 @@ void InitTestPatch()
 
     patch.numVcos = 2;
 
-    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SAW);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SAW);
     patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(0.0f);
     patch.vcoEnvAttack.push_back(0.002f);
@@ -186,7 +187,7 @@ void InitTestPatch()
     patch.vcoLfoRate.push_back(3.3f);
     patch.vcoLfoDepth.push_back(0.03f);
 
-    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SAW);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SAW);
     patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(-0.007f);
     patch.vcoEnvAttack.push_back(0.002f);
@@ -246,7 +247,7 @@ void InitTestPatch2()
 
     patch.numVcos = 2;
 
-    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SQUARE);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SQUARE);
     patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(0.0f);
     patch.vcoEnvAttack.push_back(0.002f);
@@ -258,7 +259,7 @@ void InitTestPatch2()
     patch.vcoLfoRate.push_back(3.3f);
     patch.vcoLfoDepth.push_back(0.0f);
 
-    patch.vcoWaveform.push_back((int) Oscillator::WAVE_POLYBLEP_SQUARE);
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SQUARE);
     patch.vcoLevel.push_back(0.5f);
     patch.vcoPitchOffset.push_back(-0.007f);
     patch.vcoEnvAttack.push_back(0.002f);
@@ -288,7 +289,79 @@ void InitTestPatch2()
     patch.vcaEnvSustain = 0.0f;
     patch.vcaEnvRelease = 0.1f;
     patch.vcaLfoWaveform = (int) Oscillator::WAVE_TRI;
-    patch.vcaLfoRate = 1.5f;
+    patch.vcaLfoRate = 0.3f;
+    patch.vcaLfoDepth = 0.0f;
+
+    synth.LoadPatch(&patch);
+}
+
+
+void InitTestPatch3()
+{
+    KSynthPatch patch;
+    patch.patchName = "TestPatch3";
+    patch.pitchOffset = 0.0f;
+    patch.level = 0.5f;
+
+    patch.chorusAmount = 0.0f;
+    patch.chorusDelay = 0.75f;
+    patch.chorusFeedback = 0.2f;
+    patch.chorusLfoFreq = 0.3f;
+    patch.chorusLfoDepth = 0.9f;
+
+    patch.delayTime = 0.25f;
+    patch.delayLevel = 0.0f;
+    patch.delayFeedback = 0.2f;
+
+    patch.reverbLevel = 0.15f;
+    patch.reverbFeedback = 0.5f;
+    patch.reverbLpFreq = 12000.0f;
+
+    patch.numVcos = 2;
+
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SAW);
+    patch.vcoLevel.push_back(0.5f);
+    patch.vcoPitchOffset.push_back(0.0f);
+    patch.vcoEnvAttack.push_back(0.5f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(0.002f);
+    patch.vcoEnvDepth.push_back(0.01f);
+    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(0.3f);
+    patch.vcoLfoDepth.push_back(0.0f);
+
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SAW);
+    patch.vcoLevel.push_back(0.5f);
+    patch.vcoPitchOffset.push_back(0.0f);
+    patch.vcoEnvAttack.push_back(0.002f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(0.002f);
+    patch.vcoEnvDepth.push_back(0.0f);
+    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(0.3f);
+    patch.vcoLfoDepth.push_back(0.0f);
+
+    patch.whiteNoiseOscLevel = 0.0f;
+
+    patch.vcfFrequency = 14000.0f;
+    patch.vcfResonance = 0.0f;
+    patch.vcfEnvAttack = 0.002f;
+    patch.vcfEnvDecay = 0.0f;
+    patch.vcfEnvSustain = 1.0f;
+    patch.vcfEnvRelease = 0.002f;
+    patch.vcfEnvDepth = 0.0f;
+    patch.vcfLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcfLfoRate = 0.3f;
+    patch.vcfLfoDepth = 0.0f;
+
+    patch.vcaEnvAttack = 0.002f;
+    patch.vcaEnvDecay = 0.0f;
+    patch.vcaEnvSustain = 1.0f;
+    patch.vcaEnvRelease = 0.002f;
+    patch.vcaLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcaLfoRate = 0.3f;
     patch.vcaLfoDepth = 0.0f;
 
     synth.LoadPatch(&patch);
