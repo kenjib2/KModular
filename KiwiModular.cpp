@@ -24,6 +24,8 @@ float volume = 1.0f;
 
 DaisyPod    hw;
 KSynth      synth;
+Limiter     limiterL;
+Limiter     limiterR;
 MidiTrigger midiTrigger;
 Parameter knob1;
 Parameter knob2;
@@ -79,15 +81,15 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
         synth.Trigger(TriggerCommand::TriggerNoteOff, intVals, NULL);
     }
 
-    float floatVals[1];
+/*    float floatVals[1];
     int intVals[1];
     intVals[0] = SynthParam::VcfFrequency;
     floatVals[0] = knob1.Process();
-//    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);
+    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);
 
     intVals[0] = SynthParam::VcfResonance;
     floatVals[0] = knob2.Process();
-//    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);
+    synth.Trigger(TriggerCommand::TriggerParamChange, intVals, floatVals);*/
 
 	for (size_t i = 0; i < size; i++)
 	{
@@ -96,6 +98,9 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 		out[0][i] = outSamples[0] * volume;
 		out[1][i] = outSamples[1] * volume;
 	}
+
+    limiterL.ProcessBlock(out[0], size, 1.0f);
+    limiterR.ProcessBlock(out[1], size, 1.0f);
 
 #ifdef DEBUG
 	cpuLoadMeter.OnBlockEnd();
@@ -125,6 +130,9 @@ int main(void)
 	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
     InitTestPatch();
 
+    limiterL.Init();
+    limiterR.Init();
+
     midiTrigger.Init(&hw);
     midiTrigger.AddMidiListener(&synth);
 
@@ -148,7 +156,7 @@ void InitTestPatch()
     KSynthPatch patch;
     patch.patchName = "TestPatch";
     patch.pitchOffset = 0.0f;
-    patch.level = 0.2f;
+    patch.level = 1.0f;
 
     patch.chorusAmount = 0.f;
     patch.chorusDelay = 0.75f;
@@ -163,8 +171,6 @@ void InitTestPatch()
     patch.reverbLevel = 0.35f;
     patch.reverbFeedback = 0.82f;
     patch.reverbLpFreq = 12000.0f;
-
-    //patch.voiceLevel = 1.0f;
 
     patch.numVcos = 2;
 
@@ -222,7 +228,7 @@ void InitTestPatch2()
     KSynthPatch patch;
     patch.patchName = "TestPatch2";
     patch.pitchOffset = 0.0f;
-    patch.level = 0.4f;
+    patch.level = 0.5f;
 
     patch.chorusAmount = 0.0f;
     patch.chorusDelay = 0.75f;
@@ -237,8 +243,6 @@ void InitTestPatch2()
     patch.reverbLevel = 0.35f;
     patch.reverbFeedback = 0.82f;
     patch.reverbLpFreq = 12000.0f;
-
-    //patch.voiceLevel = 1.0f;
 
     patch.numVcos = 2;
 

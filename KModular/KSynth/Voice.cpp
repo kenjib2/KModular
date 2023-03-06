@@ -29,7 +29,7 @@ namespace kmodular
 
     void Voice::Reset()
     {
-        level = 1.0f;
+        level = 0.25f;
         for (size_t i = 0; i < vcos.size(); i++) {
             vcos[i].Reset();
         }

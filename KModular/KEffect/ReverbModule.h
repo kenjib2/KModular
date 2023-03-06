@@ -13,10 +13,10 @@ using namespace daisysp;
 
 namespace kmodular
 {
+    static ReverbSc DSY_SDRAM_BSS reverb; // Going into SDRAM adds 10% MCU utilization
 
     class ReverbModule: public AudioModule {
         public:
-            ReverbSc reverb;
             float level;
             float feedback;
             float lpFreq;
