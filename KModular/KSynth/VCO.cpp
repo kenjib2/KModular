@@ -44,7 +44,13 @@ namespace kmodular
             return;
         }
 
-        float envAmount = 1.0f + env.Process(noteTriggered) * envDepth;
+        float envAmount;
+        float envMultiplier = envDepth;
+        if (signbit(envMultiplier)) { // If envMultiplier is negative
+            envAmount = -1.0f + env.Process(noteTriggered) * envMultiplier;
+        } else {
+            envAmount = 1.0f + env.Process(noteTriggered) * envMultiplier;
+        }
         float lfoAmount = lfo.Process();
         float lfoModifier = (1.0f - lfoAmount / 2) + lfoAmount;
         float calculatedFreq = baseFreq * lfoModifier * envAmount;

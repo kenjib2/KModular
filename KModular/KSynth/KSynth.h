@@ -12,6 +12,7 @@
 #include "../KEffect/ChorusModule.h"
 #include "../KEffect/DelayModule.h"
 #include "../KEffect/ReverbModule.h"
+#include "../KEffect/Repeater.h"
 #include "KSynthPatch.h"
 
 
@@ -42,6 +43,7 @@ namespace kmodular
             ChorusModule    chorus;
             DelayModule     delay;
             ReverbModule    reverb;
+            Repeater        repeater;
             float           level;
             float           pitchOffset;
             int             ccSelectedVco;

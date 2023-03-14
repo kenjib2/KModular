@@ -1,10 +1,10 @@
 #include "daisy_pod.h"
 #include "daisysp.h"
+#include "KModular/AudioModule.h"
+#include "KModular/BufferManager.h"
+#include "KModular/MidiTrigger.h"
 #include "KModular/KSynth/KSynth.h"
 #include "KModular/KSynth/KSynthPatch.h"
-#include "KModular/AudioModule.h"
-#include "KModular/KEffect/DelayModule.h"
-#include "KModular/MidiTrigger.h"
 
 
 #define DEBUG
@@ -35,13 +35,14 @@ Parameter knob2;
 
 
 // TODO
+// To move delay buffers into SDRAM, will have to get rid of malloc. So an array of fixed buffers and then each instance needs to keep track of which buffer it is using.
 // Voice level isn't working when less than 1.0f
 // With patch2 some voices don't play on subsequent notes -- something to do with retriggering envelope? If you hold down a note and play a second note after decay, the 2nd note wont sound.
-// Figure out my some NoteOff signals don't get through
+// Patch2 craps out after playing for a while. Is something weird going on with phase cancellation?
+// MIDI input is messed up. Both extra notes in and notes not cutting off.
 // make VCO/VCA/VCF mods logorithmic?
 // Only listen to set midi channel
 // Add velocity to NoteOn
-// Look into clipping issues
 // Add pan/balance
 // Implement access to all functions via MIDI
 // Make some MIDI CC translations in KSynth scale logorithmically
@@ -50,6 +51,7 @@ Parameter knob2;
 void InitTestPatch();
 void InitTestPatch2();
 void InitTestPatch3();
+void InitTestPatch4();
 
 
 void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, size_t size)
@@ -122,14 +124,16 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
 int main(void)
 {
 	hw.Init();
-	hw.SetAudioBlockSize(128); // number of samples handled per callback
+	hw.SetAudioBlockSize(48); // number of samples handled per callback
 	hw.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
 
     knob1.Init(hw.knob1, 80, 18000, Parameter::LOGARITHMIC);
     knob2.Init(hw.knob2, 0, 1, Parameter::LINEAR);
 
 	synth.Init(hw.AudioSampleRate(), &hw, NUM_VOICES);
-    InitTestPatch3();
+    InitTestPatch2();
+    // Create the BufferManager singleton instance in advance.
+    [[maybe_unused]] BufferManager* bufferManager = BufferManager::GetInstance();
 
     limiterL.Init();
     limiterR.Init();
@@ -152,10 +156,11 @@ int main(void)
 }
 
 
+// More names: Memory, Ponderous, Immensity, Gravity, Horizon, Tidal, Solitude, Sundown, Antares, Nebula, Constellation, Atmosphere
 void InitTestPatch()
 {
     KSynthPatch patch;
-    patch.patchName = "TestPatch";
+    patch.patchName = "Daybreak"; // Modwheel needs to go to VCF cutoff on this one!
     patch.pitchOffset = 0.0f;
     patch.level = 1.0f;
 
@@ -227,7 +232,7 @@ void InitTestPatch()
 void InitTestPatch2()
 {
     KSynthPatch patch;
-    patch.patchName = "TestPatch2";
+    patch.patchName = "Ponder";
     patch.pitchOffset = 0.0f;
     patch.level = 0.5f;
 
@@ -261,7 +266,7 @@ void InitTestPatch2()
 
     patch.vcoWaveform.push_back((int) Oscillator::WAVE_SQUARE);
     patch.vcoLevel.push_back(0.5f);
-    patch.vcoPitchOffset.push_back(-0.007f);
+    patch.vcoPitchOffset.push_back(-0.06f);
     patch.vcoEnvAttack.push_back(0.002f);
     patch.vcoEnvDecay.push_back(0.0f);
     patch.vcoEnvSustain.push_back(1.0f);
@@ -363,6 +368,78 @@ void InitTestPatch3()
     patch.vcaLfoWaveform = (int) Oscillator::WAVE_TRI;
     patch.vcaLfoRate = 0.3f;
     patch.vcaLfoDepth = 0.0f;
+
+    synth.LoadPatch(&patch);
+}
+
+
+void InitTestPatch4()
+{
+    KSynthPatch patch;
+    patch.patchName = "Mourn";
+    patch.pitchOffset = 0.0f;
+    patch.level = 0.5f;
+
+    patch.chorusAmount = 0.0f;
+    patch.chorusDelay = 0.75f;
+    patch.chorusFeedback = 0.2f;
+    patch.chorusLfoFreq = 0.3f;
+    patch.chorusLfoDepth = 0.9f;
+
+    patch.delayTime = 0.45f;
+    patch.delayLevel = 0.30f;
+    patch.delayFeedback = 0.2f;
+
+    patch.reverbLevel = 0.0f;
+    patch.reverbFeedback = 0.85f;
+    patch.reverbLpFreq = 12000.0f;
+
+    patch.numVcos = 2;
+
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SAW);
+    patch.vcoLevel.push_back(0.5f);
+    patch.vcoPitchOffset.push_back(0.0f);
+    patch.vcoEnvAttack.push_back(0.5f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(0.002f);
+    patch.vcoEnvDepth.push_back(0.0f);
+    patch.vcoLfoWaveform.push_back((int) Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(0.3f);
+    patch.vcoLfoDepth.push_back(0.01f);
+
+    patch.vcoWaveform.push_back((int) Oscillator::WAVE_SAW);
+    patch.vcoLevel.push_back(0.5f);
+    patch.vcoPitchOffset.push_back(-12.0f);
+    patch.vcoEnvAttack.push_back(2.0f);
+    patch.vcoEnvDecay.push_back(0.0f);
+    patch.vcoEnvSustain.push_back(1.0f);
+    patch.vcoEnvRelease.push_back(6.0f);
+    patch.vcoEnvDepth.push_back(1.0f);
+    patch.vcoLfoWaveform.push_back((int)Oscillator::WAVE_TRI);
+    patch.vcoLfoRate.push_back(0.3f);
+    patch.vcoLfoDepth.push_back(0.0f);
+
+    patch.whiteNoiseOscLevel = 0.0f;
+
+    patch.vcfFrequency = 3600.0f;
+    patch.vcfResonance = 0.1f;
+    patch.vcfEnvAttack = 0.002f;
+    patch.vcfEnvDecay = 0.0f;
+    patch.vcfEnvSustain = 1.0f;
+    patch.vcfEnvRelease = 0.002f;
+    patch.vcfEnvDepth = 0.0f;
+    patch.vcfLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcfLfoRate = 0.3f;
+    patch.vcfLfoDepth = 0.0f;
+
+    patch.vcaEnvAttack = 1.3f;
+    patch.vcaEnvDecay = 0.0f;
+    patch.vcaEnvSustain = 1.0f;
+    patch.vcaEnvRelease = 0.8f;
+    patch.vcaLfoWaveform = (int) Oscillator::WAVE_TRI;
+    patch.vcaLfoRate = 5.0f;
+    patch.vcaLfoDepth = 0.09f;
 
     synth.LoadPatch(&patch);
 }

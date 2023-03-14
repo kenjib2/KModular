@@ -23,6 +23,7 @@ namespace kmodular
         chorus.Init(sampleRate);
         delay.Init(sampleRate);
         reverb.Init(sampleRate);
+        repeater.Init(sampleRate);
 
         Reset();
     }
@@ -40,6 +41,7 @@ namespace kmodular
         chorus.Reset();
         delay.Reset();
         reverb.Reset();
+        repeater.Reset();
     }
 
 
@@ -58,7 +60,7 @@ namespace kmodular
         }
 
         float fxOut[2];
-        chorus.Process(result, fxOut, sizeIn, 2);
+/*        chorus.Process(result, fxOut, sizeIn, 2);
         result[0] = fxOut[0];
         result[1] = fxOut[1];
 
@@ -67,6 +69,10 @@ namespace kmodular
         result[1] = fxOut[1];
 
         reverb.Process(result, fxOut, 2, 2);
+        result[0] = fxOut[0];
+        result[1] = fxOut[1];*/
+
+        repeater.Process(result, fxOut, 2, 2);
         result[0] = fxOut[0];
         result[1] = fxOut[1];
 
