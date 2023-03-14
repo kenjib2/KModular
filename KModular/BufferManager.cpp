@@ -5,9 +5,6 @@ namespace kmodular
 {
 
     BufferManager* BufferManager::_instance = NULL;
-//    float DSY_SDRAM_BSS BufferManager::shortBuffers[NUM_SHORT][SHORT_BUFFER_SIZE];
-//    float DSY_SDRAM_BSS BufferManager::mediumBuffers[NUM_MEDIUM][MEDIUM_BUFFER_SIZE];
-//    float DSY_SDRAM_BSS BufferManager::longBuffers[NUM_LONG][LONG_BUFFER_SIZE];
     bool BufferManager::shortInUse[NUM_SHORT];
     bool BufferManager::mediumInUse[NUM_MEDIUM];
     bool BufferManager::longInUse[NUM_LONG];

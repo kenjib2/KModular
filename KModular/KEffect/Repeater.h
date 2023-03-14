@@ -8,7 +8,7 @@
 #include "delay/MultiTapDelay.h"
 
 
-const int REPEATER_BUFFER_SECONDS = 1;
+const int REPEATER_BUFFER_SECONDS = 2;
 
 
 namespace kmodular
