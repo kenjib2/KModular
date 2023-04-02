@@ -17,7 +17,7 @@ namespace kmodular
     const float MAX_DELAY_TIME = 2.5f;
     const float MIN_DELAY_TIME = 0.050f;
     // Set max delay time to 0.75 of samplerate.
-    const int MAX_DELAY = (size_t)(96000 * MAX_DELAY_TIME);
+    const int MAX_DELAY = (size_t)(48000 * MAX_DELAY_TIME);
     static DelayLine<float, MAX_DELAY> DSY_SDRAM_BSS delayL;
     static DelayLine<float, MAX_DELAY> DSY_SDRAM_BSS delayR;
 

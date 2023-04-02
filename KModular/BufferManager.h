@@ -11,15 +11,15 @@ using namespace daisysp;
 
 
 const int BUFFER_SAMPLES_PER_SEC = 48000;
-const float SHORT_SECS = 0.5f;
+const float SHORT_SECS = 0.2f;
 const float MEDIUM_SECS = 3.0f;
 const float LONG_SECS = 20.0f;
 const int SHORT_BUFFER_SIZE = (int)(BUFFER_SAMPLES_PER_SEC * SHORT_SECS + __FLT_EPSILON__);
 const int MEDIUM_BUFFER_SIZE = (int)(BUFFER_SAMPLES_PER_SEC * MEDIUM_SECS + __FLT_EPSILON__);
 const int LONG_BUFFER_SIZE = (int)(BUFFER_SAMPLES_PER_SEC * LONG_SECS + __FLT_EPSILON__);
-const int NUM_SHORT = 24;
-const int NUM_MEDIUM = 12;
-const int NUM_LONG = 6;
+const int NUM_SHORT = 80; // 18 combined are about 1% of total SDRAM
+const int NUM_MEDIUM = 16; // About 1% of total SDRAM each
+const int NUM_LONG = 8; // About 6% of total SDRAM each
 
 
 namespace kmodular
